@@ -15,6 +15,8 @@ python manage.py startapp Store
 
 **3、创建App下模板目录及静态文件目录**
 
+![static](https://github.com/py304/DjangoShop/blob/master/images/static.jpg)
+
 
 **4、创建主static目录用于收集静态文件**
 
@@ -108,4 +110,177 @@ python manage.py migrate
 
 收集静态文件
 python manage.py collectstatic(收集完成注意恢复配置，并注释STATIC_ROOT)
+
+
+## 三、创建登录注册功能
+
+**1、编写注册登录功能**
+
+将模板中的注册HTML文件复制到App下templates-store下
+
+![reg](https://github.com/py304/DjangoShop/blob/master/images/reg_temp.jpg)
+
+编写简单视图显示页面
+
+![](https://github.com/py304/DjangoShop/blob/master/images/sim_view.jpg)
+
+创建独立url
+
+![](https://github.com/py304/DjangoShop/blob/master/images/sub_url.jpg)
+
+填写主url
+
+![](https://github.com/py304/DjangoShop/blob/master/images/main_url.jpg)
+
+更改原html文档，将所有css,js导入路径更改为/static/store/...,在访问网页
+
+![](https://github.com/py304/DjangoShop/blob/master/images/template.jpg)
+
+改动HTML布局
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>SB Admin 2 - Register</title>
+
+  <!-- Custom fonts for this template-->
+  <link href="/static/store/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="/static/store/css/sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body class="bg-gradient-primary">
+
+  <div class="container">
+
+    <div class="card o-hidden border-0 shadow-lg my-5">
+      <div class="card-body p-0">
+        <!-- Nested Row within Card Body -->
+        <div class="row">
+          <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+          <div class="col-lg-7">
+            <div class="p-5">
+              <div class="text-center">
+                <h1 class="h4 text-gray-900 mb-4">注册用户</h1>
+              </div>
+              <form class="user" method="post">
+					{% csrf_token %}
+                <div class="form-group">
+                  <input type="text" class="form-control form-control-user" name="username" placeholder="用户名">
+                </div>
+                <div class="form-group">
+                  <input type="password" class="form-control form-control-user" name="password" placeholder="密码">
+                </div>
+                <div class="form-group">
+                  <input type="submit" class="btn btn-primary btn-user btn-block" value="注册">
+                </div>
+{#                <a href="login.html" class="btn btn-primary btn-user btn-block">#}
+{#                  Register Account#}
+{#                </a>#}
+                <hr>
+{#                <a href="index.html" class="btn btn-google btn-user btn-block">#}
+{#                  <i class="fab fa-google fa-fw"></i> Register with Google#}
+{#                </a>#}
+{#                <a href="index.html" class="btn btn-facebook btn-user btn-block">#}
+{#                  <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook#}
+{#                </a>#}
+              </form>
+              <hr>
+              <div class="text-center">
+                <a class="small" href="forgot-password.html">忘记密码?</a>
+              </div>
+              <div class="text-center">
+                <a class="small" href="login.html">已经有账户了? 登录!</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="/static/store/vendor/jquery/jquery.min.js"></script>
+  <script src="/static/store/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="/static/store/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="/static/store/js/sb-admin-2.min.js"></script>
+
+</body>
+
+</html>
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/register.jpg)
+
+复制register文档做登录页面并编写完整注册视图函数：
+
+```python
+import hashlib
+
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+
+from Store.models import *
+
+# Create your views here.
+# 密码加密功能
+def setPassword(password):
+    md5 = hashlib.md5()
+    md5.update(password.encode())
+    result = md5.hexdigest()
+    return result
+
+# 注册功能
+def register(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        if username and password:
+            seller = Seller()
+            seller.username = username
+            seller.password = setPassword(password)
+            seller.nickname = username
+            seller.save()
+            return HttpResponseRedirect("/Store/login/")
+    return render(request,"store/register.html")
+
+
+# 登录功能
+def login(request):
+    return render(request,"store/login.html")
+```
+
+
+测试注册功能
+
+![](https://github.com/py304/DjangoShop/blob/master/images/test.jpg)
+
+
+
+
+
+
+
+
+
+
 
