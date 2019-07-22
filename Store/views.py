@@ -94,6 +94,7 @@ def loginValid(fun):
 def index(request):
     return render(request,"store/index.html",locals())
 
+# 前端注册功能用户校验
 def ajax_regValid(request):
     # ajax前端注册校验
     result = {"status": "error", "data": ""}
@@ -108,3 +109,10 @@ def ajax_regValid(request):
     else:
         result["data"] = "用户名不能为空"
     return JsonResponse(result)
+
+# 退出功能（删除cookie)
+def exit(request):
+    response = HttpResponseRedirect("/Store/login/")
+    response.delete_cookie("username")
+    del request.session["username"]
+    return response

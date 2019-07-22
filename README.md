@@ -472,6 +472,26 @@ def ajax_regValid(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/regerror.jpg)
 
 
+## 三、编写退出功能（删除cookie）
+
+定义视图函数：
+
+```python
+# 退出功能（删除cookie)
+def exit(request):
+    response = HttpResponseRedirect("/Store/login/")
+    response.delete_cookie("username")
+    del request.session["username"]
+    return response
+
+```
+
+更改首页logout超链接的href为/Store/exit/
+
+![](https://github.com/py304/DjangoShop/blob/master/images/exit.jpg)
+
+
+
 
 
 
