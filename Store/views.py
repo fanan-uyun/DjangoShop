@@ -2,6 +2,7 @@ import hashlib
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 
 from Store.models import *
 
@@ -15,6 +16,8 @@ def setPassword(password):
 
 # 注册功能
 def register(request):
+    # 前端校验
+    result = {"status": "error", "data": ""}
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -34,6 +37,8 @@ def login(request):
     登录功能：进入登录页面是下发cookie，验证是正常方式请求登录
     登录成功再次下发一个cookie，验证用户
     """
+    # 后端校验
+    result = {"status":"error","data":""}
     # 进入登录页面下发来源合法的cookie
     response = render(request,"store/login.html")
     response.set_cookie("login_from","legitimate")
@@ -53,7 +58,18 @@ def login(request):
                     response = HttpResponseRedirect('/Store/index/')
                     response.set_cookie("username",seller.username)
                     request.session["username"] = seller.username
+                    result["status"] = "success"
+                    result["data"] = "登录成功"
                     return response
+                else:
+                    result["data"] = "密码错误"
+                    response = render(request, "store/login.html", locals())
+            else:
+                result["data"] = "用户名不存在"
+                response = render(request, "store/login.html", locals())
+        else:
+            result["data"] = "用户名或密码不能为空"
+            response = render(request, "store/login.html",locals())
     return response
 
 # 用户登录校验装饰器
@@ -77,3 +93,18 @@ def loginValid(fun):
 @loginValid
 def index(request):
     return render(request,"store/index.html",locals())
+
+def ajax_regValid(request):
+    # ajax前端注册校验
+    result = {"status": "error", "data": ""}
+    username = request.POST.get("username")
+    if username:
+        user = Seller.objects.filter(username=username).first() # 数据库查询该用户
+        if user:
+            result["data"] = "用户名已存在"
+        else:
+            result["status"] = "success"
+            result["data"] = "用户名可以使用"
+    else:
+        result["data"] = "用户名不能为空"
+    return JsonResponse(result)

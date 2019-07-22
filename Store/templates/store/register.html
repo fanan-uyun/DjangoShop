@@ -37,13 +37,13 @@
               <form class="user" method="post">
                   {% csrf_token %}
                 <div class="form-group">
-                  <input type="text" class="form-control form-control-user" name="username" placeholder="用户名">
+                  <input type="text" class="form-control form-control-user" id="username" name="username" placeholder="用户名">
                 </div>
                 <div class="form-group">
                   <input type="password" class="form-control form-control-user" name="password" placeholder="密码">
                 </div>
                 <div class="form-group">
-                  <input type="submit" class="btn btn-primary btn-user btn-block" value="注册">
+                  <input type="submit" class="btn btn-primary btn-user btn-block" id="submit" value="注册">
                 </div>
 {#                <a href="login.html" class="btn btn-primary btn-user btn-block">#}
 {#                  Register Account#}
@@ -56,6 +56,7 @@
 {#                  <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook#}
 {#                </a>#}
               </form>
+              <p class="text-center text-danger" id="sign"></p>
               <hr>
               <div class="text-center">
                 <a class="small" href="#">忘记密码?</a>
@@ -80,6 +81,42 @@
 
   <!-- Custom scripts for all pages-->
   <script src="/static/store/js/sb-admin-2.min.js"></script>
+
+  <script>
+      $("#username").blur(
+          function () {
+              var username = $("#username").val();
+              var csrfmiddlewaretoken = '{{ csrf_token }}';
+              var url = "/Store/ajax/";
+              send_data = {
+                  "username":username,
+                  "csrfmiddlewaretoken":csrfmiddlewaretoken
+              };
+              $.ajax(
+                  {
+                      url: url,
+                      type: "post",
+                      data: send_data,
+                      success: function (data) {
+                          var status = data.status;
+                          $("#sign").text(data.data);
+                          if(status == "error"){
+                              $("#submit").attr("disabled",true)
+                          }else {
+                              $("#submit").attr("disabled",false)
+                          }
+                          {#alert(data.data)#}
+                          {#console.log(data)#}
+                      },
+                      error: function (error) {
+                          console.log(error)
+                      }
+                  }
+              )
+          }
+      )
+
+  </script>
 
 </body>
 

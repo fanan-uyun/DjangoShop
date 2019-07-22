@@ -355,6 +355,126 @@ def index(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/valid.jpg)
 
 
+**3、前后端用户名重复校验**
+
+后端（针对登录功能）
+
+```python
+# 登录功能
+def login(request):
+    """
+    登录功能：进入登录页面是下发cookie，验证是正常方式请求登录
+    登录成功再次下发一个cookie，验证用户
+    """
+    # 后端校验
+    result = {"status":"error","data":""}
+    # 进入登录页面下发来源合法的cookie
+    response = render(request,"store/login.html")
+    response.set_cookie("login_from","legitimate")
+    # 判断用户请求的方式
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        if username and password: # 用户和密码都存在
+            seller = Seller.objects.filter(username=username).first() # 数据库查询该用户
+            if seller:
+                # 将前端获取到的密码加密，同数据库进行验证
+                web_password = setPassword(password)
+                # 校验登录页面的cookie
+                cookies = request.COOKIES.get("login_from")
+                if web_password == seller.password and cookies == "legitimate":
+                    # 登录成功，则跳转到首页并下发cookie和session
+                    response = HttpResponseRedirect('/Store/index/')
+                    response.set_cookie("username",seller.username)
+                    request.session["username"] = seller.username
+                    result["status"] = "success"
+                    result["data"] = "登录成功"
+                    return response
+                else:
+                    result["data"] = "密码错误"
+                    response = render(request, "store/login.html", locals())
+            else:
+                result["data"] = "用户名不存在"
+                response = render(request, "store/login.html", locals())
+        else:
+            result["data"] = "用户名或密码不能为空"
+            response = render(request, "store/login.html",locals())
+    return response
+```
+
+效果图：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/loginerror.jpg)
+
+
+前端校验（针对注册功能）
+
+```python
+def ajax_regValid(request):
+    # ajax前端注册校验
+    result = {"status": "error", "data": ""}
+    username = request.POST.get("username")
+    if username:
+        user = Seller.objects.filter(username=username).first() # 数据库查询该用户
+        if user:
+            result["data"] = "用户名已存在"
+        else:
+            result["status"] = "success"
+            result["data"] = "用户名可以使用"
+    else:
+        result["data"] = "用户名不能为空"
+    return JsonResponse(result)
+```
+
+注册页面添加如下内容：
+
+```html
+<script>
+      $("#username").blur(
+          function () {
+              var username = $("#username").val();
+              var csrfmiddlewaretoken = '{{ csrf_token }}';
+              var url = "/Store/ajax/";
+              send_data = {
+                  "username":username,
+                  "csrfmiddlewaretoken":csrfmiddlewaretoken
+              };
+              $.ajax(
+                  {
+                      url: url,
+                      type: "post",
+                      data: send_data,
+                      success: function (data) {
+                          var status = data.status;
+                          $("#sign").text(data.data);
+                          if(status == "error"){
+                              $("#submit").attr("disabled",true)
+                          }else {
+                              $("#submit").attr("disabled",false)
+                          }
+                          {#alert(data.data)#}
+                          {#console.log(data)#}
+                      },
+                      error: function (error) {
+                          console.log(error)
+                      }
+                  }
+              )
+          }
+      )
+
+  </script>
+
+```
+
+效果图：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/regerror.jpg)
+
+
+
+
+
 
 
 

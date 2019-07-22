@@ -5,5 +5,6 @@ urlpatterns = [
     path('register/', register),
     path('login/', login),
     path('index/', index),
-    re_path(r'^$',index)
+    re_path(r'^$',index),
+    path('ajax/',ajax_regValid),
 ]
