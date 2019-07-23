@@ -1118,21 +1118,25 @@ def store_register(request):
 后端业务视图：
 
 ```python
+# v1.6添加商品
 def add_goods(request):
     if request.method == "POST":
+        # v1.6 获取前端post请求数据
         good_postData = request.POST
+        # v1.6 通过前端name字段获取实际的值存储起来
         goods_name = good_postData.get("goods_name")
         goods_price = good_postData.get("goods_price")
         goods_number = good_postData.get("goods_number")
         goods_description = good_postData.get("goods_description")
         goods_date = good_postData.get("goods_date")
         goods_safeDate = good_postData.get("goods_safeDate")
-
+        # v1.6 注意图片是通过FILES方式获取
         goods_image = request.FILES.get("goods_image")
+        # v1.6 多对多关系字段，前端使用隐藏域
         store_id = good_postData.get("store_id")
 
         # 保存正常数据
-        goods = Goods()
+        goods = Goods() # 实例化一个商品对象
         goods.goods_name = goods_name
         goods.goods_price = goods_price
         goods.goods_number = goods_number
@@ -1140,9 +1144,9 @@ def add_goods(request):
         goods.goods_date = goods_date
         goods.goods_safeDate = goods_safeDate
         goods.goods_image = goods_image
-        goods.save()
+        goods.save() # 保存一条记录
 
-        # 保存多对多数据
+        # 保存多对多数据(注意get方式获取到的数据为字符串)
         goods.store_id.add(
             Store.objects.get(id=int(store_id))
         )
@@ -1158,6 +1162,64 @@ def add_goods(request):
 ## 七、商品列表
 
 前端：
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    商品列表页面
+{% endblock %}
+
+{% block label %}
+    <a class="btn btn-warning" href="/Store/add_good/">添加商品</a>
+{% endblock %}
+
+{% block content %}
+    <table class="table-bordered table">
+        <thead>
+            <tr>
+                <th>商品名称</th>
+                <th>商品价格</th>
+                <th>商品数量</th>
+                <th>出厂日期</th>
+                <th>保质期</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+            {% for goods in goods_list %}
+            <tr>
+                <td>{{ goods.goods_name }}</td>
+                <td>{{ goods.goods_price }}</td>
+                <td>{{ goods.goods_number }}</td>
+                <td>{{ goods.goods_date }}</td>
+                <td>{{ goods.goods_safeDate }}</td>
+                <td>
+                    <a class="btn btn-danger" href="#">下架</a>
+                    <a class="btn btn-primary" href="#">销毁</a>
+                </td>
+            </tr>
+            {% endfor %}
+        <tbody>
+
+        </tbody>
+    </table>
+{% endblock %}
+
+```
+
+后端：
+
+```python
+# v1.7 展示商品列表
+def list_goods(request):
+    # v1.7 查询所有商品信息(提前添加了商品数据)
+    goods_list = Goods.objects.all()
+    return render(request,"store/goods_list.html",locals())
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_list.jpg)
 
 
 

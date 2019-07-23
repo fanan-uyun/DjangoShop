@@ -72,7 +72,7 @@
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">商品信息:</h6>
             <a class="collapse-item" href="/Store/add_good/">添加商品</a>
-            <a class="collapse-item" href="#">商品列表</a>
+            <a class="collapse-item" href="/Store/goods_list/">商品列表</a>
             <a class="collapse-item" href="#">商品详情</a>
           </div>
         </div>
@@ -298,11 +298,15 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-
+        <div class="container-fluid">
+          <!-- Page Heading -->
+          <h1 class="h3 mb-4 text-gray-800">{% block label%}{% endblock %}</h1>
+        </div>
         <!-- /.container-fluid -->
-        {% block content %}
-
-        {% endblock %}
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
 
       </div>
       <!-- End of Main Content -->
@@ -341,7 +345,7 @@
         <div class="modal-body">如果您准备结束当前会话，请选择下面的“注销”.</div>
         <div class="modal-footer">
           <button class="btn btn-secondary" type="button" data-dismiss="modal">取消</button>
-          <a class="btn btn-primary" href="login.html">注销</a>
+          <a class="btn btn-primary" href="/Store/exit/">注销</a>
         </div>
       </div>
     </div>

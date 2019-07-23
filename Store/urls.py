@@ -12,5 +12,6 @@ urlpatterns = [
 
 urlpatterns += [
     path('store_register/', store_register),
-    path('add_good/', add_goods)
+    path('add_good/', add_goods),
+    path('goods_list/', list_goods)
 ]

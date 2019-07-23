@@ -1,0 +1,40 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    商品列表页面
+{% endblock %}
+
+{% block label %}
+    <a class="btn btn-warning" href="/Store/add_good/">添加商品</a>
+{% endblock %}
+
+{% block content %}
+    <table class="table-bordered table">
+        <thead>
+            <tr>
+                <th>商品名称</th>
+                <th>商品价格</th>
+                <th>商品数量</th>
+                <th>出厂日期</th>
+                <th>保质期</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+            {% for goods in goods_list %}
+            <tr>
+                <td>{{ goods.goods_name }}</td>
+                <td>{{ goods.goods_price }}</td>
+                <td>{{ goods.goods_number }}</td>
+                <td>{{ goods.goods_date }}</td>
+                <td>{{ goods.goods_safeDate }}</td>
+                <td>
+                    <a class="btn btn-danger" href="#">下架</a>
+                    <a class="btn btn-primary" href="#">销毁</a>
+                </td>
+            </tr>
+            {% endfor %}
+        <tbody>
+
+        </tbody>
+    </table>
+{% endblock %}

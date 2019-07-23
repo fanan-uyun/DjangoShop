@@ -4,41 +4,41 @@
     后台管理首页
 {% endblock %}
 
-        {% block content %}
-        <form class="form" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                {% csrf_token %}
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-user"  name="goods_name" placeholder="商品名称">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-user"  name="goods_price" placeholder="商品价格">
-            </div>
-            <div class="form-group">
-                <input type="file" class="form-control form-control-user"  name="goods_image" placeholder="商品图片">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-user"  name="goods_number" placeholder="商品库存">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-user"  name="goods_description" placeholder="商品描述">
-            </div>
+{% block content %}
+<form class="form" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        {% csrf_token %}
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user"  name="goods_name" placeholder="商品名称">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user"  name="goods_price" placeholder="商品价格">
+    </div>
+    <div class="form-group">
+        <input type="file" class="form-control form-control-user"  name="goods_image" placeholder="商品图片">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user"  name="goods_number" placeholder="商品库存">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user"  name="goods_description" placeholder="商品描述">
+    </div>
 
-            <div class="form-group">
-                <input type="text" class="form-control form-control-user"  name="goods_date" placeholder="出厂日期">
-            </div>
-            <div class="form-group">
-                <input type="text" class="form-control form-control-user"  name="goods_safeDate" placeholder="保质期(月)">
-            </div>
-            <div class="form-group">
-                <input type="hidden" class="form-control form-control-user"  name="store_id" value="1">
-            </div>
-            <div class="form-group">
-                <input class="btn btn-primary btn-block" type="submit" value="添加">
-            </div>
-        </form>
-        {% endblock %}
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user"  name="goods_date" placeholder="出厂日期">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control form-control-user"  name="goods_safeDate" placeholder="保质期(月)">
+    </div>
+    <div class="form-group">
+        <input type="hidden" class="form-control form-control-user"  name="store_id" value="1">
+    </div>
+    <div class="form-group">
+        <input class="btn btn-primary btn-block" type="submit" value="添加">
+    </div>
+</form>
+{% endblock %}
 
 
 
