@@ -1186,6 +1186,7 @@ def add_goods(request):
                 <th>操作</th>
             </tr>
         </thead>
+        <tbody>
             {% for goods in goods_list %}
             <tr>
                 <td>{{ goods.goods_name }}</td>
@@ -1199,8 +1200,6 @@ def add_goods(request):
                 </td>
             </tr>
             {% endfor %}
-        <tbody>
-
         </tbody>
     </table>
 {% endblock %}
@@ -1247,6 +1246,93 @@ def list_goods(request):
 效果：
 
 ![](https://github.com/py304/DjangoShop/blob/master/images/search_g.jpg)
+
+## 九、商品列表页搜索分页功能
+
+后端：
+
+```python
+# v1.7 展示商品列表
+def list_goods(request):
+    # v1.8 添加keywords关键字字段，用户前端搜索
+    keywords = request.GET.get("keywords","")
+    # v1.9 获取前端页码,默认页码1
+    page_num = request.GET.get("page_num",1)
+    if keywords:
+        # v1.8 对关键字进行模糊查询
+        goods_list = Goods.objects.filter(goods_name__contains=keywords)
+    else:
+        # v1.7 查询所有商品信息(提前添加了商品数据)
+        goods_list = Goods.objects.all()
+    # v1.9 新增列表分页功能，创建分页器,针对good_list中的数据，每页3条数据
+    paginator = Paginator(goods_list,3)
+    # v1.9 获取具体页的数据
+    page = paginator.page(int(page_num))
+    # v1.9 返回页码列表
+    page_range = paginator.page_range
+    # 返回分页数据
+    return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords})
+```
+
+前端：
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    商品列表页面
+{% endblock %}
+
+{% block label %}
+    <a class="btn btn-warning" href="/Store/add_good/">添加商品</a>
+{% endblock %}
+
+{% block content %}
+    <table class="table-bordered table">
+        <thead>
+            <tr align="center">
+                <th>商品名称</th>
+                <th>商品价格</th>
+                <th>商品数量</th>
+                <th>出厂日期</th>
+                <th>保质期</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+{#            {% for goods in goods_list %}#}
+            {% for goods in page %}
+            <tr align="center">
+                <td>{{ goods.goods_name }}</td>
+                <td>
+                    <input type="text" value="{{ goods.goods_price }}" style="text-align: center">
+                </td>
+                <td>{{ goods.goods_number }}</td>
+                <td>{{ goods.goods_date }}</td>
+                <td>{{ goods.goods_safeDate }}</td>
+                <td>
+                    <a class="btn btn-danger" href="#">下架</a>
+                    <a class="btn btn-primary" href="#">销毁</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            {% for p in page_range %}
+            <li class="paginate_button page-item ">
+                <a class="page-link" href="?keywords={{ keywords }}&page_num={{ p }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/page.jpg)
 
 
 

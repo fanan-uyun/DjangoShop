@@ -1,8 +1,10 @@
 import hashlib
 
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
 from django.http import JsonResponse
+from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator  # v1.9 导入分页模块
+
 
 from Store.models import *
 
@@ -217,10 +219,50 @@ def add_goods(request):
 def list_goods(request):
     # v1.8 添加keywords关键字字段，用户前端搜索
     keywords = request.GET.get("keywords","")
+    # v1.9 获取前端页码,默认页码1
+    page_num = request.GET.get("page_num",1)
     if keywords:
         # v1.8 对关键字进行模糊查询
         goods_list = Goods.objects.filter(goods_name__contains=keywords)
     else:
         # v1.7 查询所有商品信息(提前添加了商品数据)
         goods_list = Goods.objects.all()
-    return render(request,"store/goods_list.html",locals())
+    # v1.9 新增列表分页功能，创建分页器,针对good_list中的数据，每页3条数据
+    paginator = Paginator(goods_list,3)
+    # v1.9 获取具体页的数据
+    page = paginator.page(int(page_num))
+    # v1.9 返回页码列表
+    page_range = paginator.page_range
+    # 返回分页数据
+    return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords})
+
+
+# def list_goods(request):
+#     """
+#     商品的列表页
+#     :param request:
+#     :return:
+#     """
+#     #完成了模糊查询
+#     keywords = request.GET.get("keywords","")
+#     page_num = request.GET.get("page_num",1)
+#     referer = request.META.get("HTTP_REFERER")
+#     if keywords:
+#         goods_list = Goods.objects.filter(goods_name__contains=keywords)
+#     else:
+#         if referer and "?" in referer:
+#             get_str = referer.split("?")[1]
+#             get_list = [i.split("=") for i in get_str.split("&")]
+#             get_dict = dict(get_list)
+#             get_dict["keywords"] = get_dict["keywords"].encode()
+#             if "keywords" in get_dict:
+#                 keywords = get_dict["keywords"]
+#             goods_list = Goods.objects.filter(goods_name__contains=keywords)
+#         else:
+#             goods_list = Goods.objects.all()
+#     #完成分页查询
+#     paginator = Paginator(goods_list,3)
+#     page = paginator.page(int(page_num))
+#     page_range = paginator.page_range
+#
+#     return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords})

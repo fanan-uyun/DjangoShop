@@ -11,7 +11,7 @@
 {% block content %}
     <table class="table-bordered table">
         <thead>
-            <tr>
+            <tr align="center">
                 <th>商品名称</th>
                 <th>商品价格</th>
                 <th>商品数量</th>
@@ -20,10 +20,14 @@
                 <th>操作</th>
             </tr>
         </thead>
-            {% for goods in goods_list %}
-            <tr>
+        <tbody>
+{#            {% for goods in goods_list %}#}
+            {% for goods in page %}
+            <tr align="center">
                 <td>{{ goods.goods_name }}</td>
-                <td>{{ goods.goods_price }}</td>
+                <td>
+                    <input type="text" value="{{ goods.goods_price }}" style="text-align: center">
+                </td>
                 <td>{{ goods.goods_number }}</td>
                 <td>{{ goods.goods_date }}</td>
                 <td>{{ goods.goods_safeDate }}</td>
@@ -33,8 +37,15 @@
                 </td>
             </tr>
             {% endfor %}
-        <tbody>
-
         </tbody>
     </table>
+    <div class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            {% for p in page_range %}
+            <li class="paginate_button page-item ">
+                <a class="page-link" href="?keywords={{ keywords }}&page_num={{ p }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endblock %}
