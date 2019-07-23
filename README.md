@@ -870,6 +870,207 @@ def exit(request):
 ```
 
 
+## 五、店铺注册
+
+在首页功能视图函数中判断用户是否有店铺，通过Store类中user_id
+
+```python
+# 首页
+@loginValid
+def index(request):
+    """
+    v1.5 添加检测账号是否有店铺的逻辑
+    """
+    # 查询当前用户
+    user_id = request.COOKIES.get("user_id")
+    if user_id:
+        user_id = int(user_id)
+    else:
+        user_id = 0
+    # 通过用户查询店铺是否存在（店铺和用户通过用户的id进行关联）
+    store = Store.objects.filter(user_id=user_id).first()
+    if store:
+        is_store = 1
+    else:
+        is_store = 0
+    return render(request,"store/index.html",{"is_store":is_store})
+
+# 登录功能
+def login(request):
+    """
+    登录功能：进入登录页面是下发cookie，验证是正常方式请求登录
+    登录成功再次下发一个cookie，验证用户
+    """
+    # 后端校验
+    result = {"status":"error","data":""}
+    # 进入登录页面下发来源合法的cookie
+    response = render(request,"store/login.html")
+    response.set_cookie("login_from","legitimate")
+    # 判断用户请求的方式
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        if username and password: # 用户和密码都存在
+            seller = Seller.objects.filter(username=username).first() # 数据库查询该用户
+            if seller:
+                # 将前端获取到的密码加密，同数据库进行验证
+                web_password = setPassword(password)
+                # 校验登录页面的cookie
+                cookies = request.COOKIES.get("login_from")
+                if web_password == seller.password and cookies == "legitimate":
+                    # 登录成功，则跳转到首页并下发cookie和session
+                    response = HttpResponseRedirect('/Store/index/')
+                    response.set_cookie("username",seller.username)
+                    # v1.5 添加下发user_id的cookie
+                    response.set_cookie("user_id", seller.id)
+                    request.session["username"] = seller.username
+                    result["status"] = "success"
+                    result["data"] = "登录成功"
+                    return response
+                else:
+                    result["data"] = "密码错误"
+                    response = render(request, "store/login.html", locals())
+            else:
+                result["data"] = "用户名不存在"
+                response = render(request, "store/login.html", locals())
+        else:
+            result["data"] = "用户名或密码不能为空"
+            response = render(request, "store/login.html",locals())
+    return response
+```
+
+前端base也添加判断
+
+```html
+      <li class="nav-item">
+        {% if is_store == 1 %}
+        <a class="nav-link" href="index.html">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>店铺管理</span></a>
+        {% else %}
+        <a class="nav-link" href="/Store/store_register/">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>没有店铺，注册一个</span></a>
+        {% endif %}
+
+      </li>
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/dian.jpg)
+
+指定一个注册店铺的前端页
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    后台管理首页
+{% endblock %}
+
+        {% block content %}
+        <form class="form" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                {% csrf_token %}
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_name" placeholder="店铺名称">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_address" placeholder="店铺地址">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_description" placeholder="店铺描述">
+            </div>
+            <div class="form-group">
+                <input type="file" class="form-control form-control-user"  name="store_logo" placeholder="店铺logo">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_phone" placeholder="店铺电话">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_money" placeholder="店铺注册资金">
+            </div>
+            <div class="form-group">
+                <select name="type" class="form-control form-control-user" multiple="multiple">
+                    {% for t in type_list %}
+                        <option value="{{ t.id }}">{{ t.store_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary btn-block" type="submit" value="注册">
+            </div>
+        </form>
+        {% endblock %}
+
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/store_reg.jpg)
+
+
+完善注册店铺视图函数：
+
+```python
+def store_register(request):
+    # v1.5 新增店铺注册
+    # 查询所有的店铺类型
+    type_list = StoreType.objects.all()
+    if request.method == "POST":
+        post_data = request.POST #接收post数据
+        # print(request.FILES)
+        # print(post_data)
+        store_name = post_data.get("store_name")
+        store_address = post_data.get("store_address")
+        store_description = post_data.get("store_description")
+        store_phone = post_data.get("store_phone")
+        store_money = post_data.get("store_money")
+
+        # 通过cookie来获得user_id
+        user_id = int(request.COOKIES.get("user_id"))
+        # 通过request.post得到类型数据，是个列表
+        type_lsts = post_data.getlist("type")
+        # 通过request.FILES获取上传的图片
+        store_logo = request.FILES.get("store_logo")
+
+        # 保存正常数据
+        store = Store()
+        store.store_name = store_name
+        store.store_address = store_address
+        store.store_description = store_description
+        store.store_phone = store_phone
+        store.store_money = store_money
+        store.user_id = user_id
+        store.store_logo = store_logo
+        store.save()
+
+        # 在生成数据中添加多对多关系字段
+        for i in type_lsts:# 循环type列表，得到类型id
+            store_type = StoreType.objects.get(id=i)#查询类型数据
+            store.type.add(store_type)# 添加到类型字段，多对多的映射表
+        store.save()
+
+
+    return render(request,"store/store_register.html",locals())
+```
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/rr.jpg)
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/store_data.jpg)
+
+
+
+## 六、添加商品
+
+
+
+
+
 
 
 

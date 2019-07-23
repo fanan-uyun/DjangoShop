@@ -42,9 +42,16 @@
 
       <!-- Nav Item - Dashboard -->
       <li class="nav-item">
+        {% if is_store == 1 %}
         <a class="nav-link" href="index.html">
           <i class="fas fa-fw fa-tachometer-alt"></i>
-          <span>店铺管理</span></a>
+                <span>店铺管理</span></a>
+        {% else %}
+        <a class="nav-link" href="/Store/store_register/">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>没有店铺，注册一个</span></a>
+        {% endif %}
+
       </li>
 
       <!-- Divider -->
@@ -63,29 +70,15 @@
         </a>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">定制组件:</h6>
-            <a class="collapse-item" href="buttons.html">按钮</a>
-            <a class="collapse-item" href="cards.html">卡片</a>
+            <h6 class="collapse-header">商品信息:</h6>
+            <a class="collapse-item" href="#">添加商品</a>
+            <a class="collapse-item" href="#">商品列表</a>
+            <a class="collapse-item" href="#">商品详情</a>
           </div>
         </div>
       </li>
 
       <!-- Nav Item - Utilities Collapse Menu -->
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
-          <i class="fas fa-fw fa-wrench"></i>
-          <span>工具</span>
-        </a>
-        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">定制工具:</h6>
-            <a class="collapse-item" href="utilities-color.html">颜色</a>
-            <a class="collapse-item" href="utilities-border.html">边框</a>
-            <a class="collapse-item" href="utilities-animation.html">动画</a>
-            <a class="collapse-item" href="utilities-other.html">其他</a>
-          </div>
-        </div>
-      </li>
 
       <!-- Divider -->
 {#      <hr class="sidebar-divider">#}

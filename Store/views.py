@@ -57,6 +57,8 @@ def login(request):
                     # 登录成功，则跳转到首页并下发cookie和session
                     response = HttpResponseRedirect('/Store/index/')
                     response.set_cookie("username",seller.username)
+                    # v1.5 添加下发user_id的cookie
+                    response.set_cookie("user_id", seller.id)
                     request.session["username"] = seller.username
                     result["status"] = "success"
                     result["data"] = "登录成功"
@@ -92,7 +94,22 @@ def loginValid(fun):
 # 首页
 @loginValid
 def index(request):
-    return render(request,"store/index.html",locals())
+    """
+    v1.5 添加检测账号是否有店铺的逻辑
+    """
+    # 查询当前用户
+    user_id = request.COOKIES.get("user_id")
+    if user_id:
+        user_id = int(user_id)
+    else:
+        user_id = 0
+    # 通过用户查询店铺是否存在（店铺和用户通过用户的id进行关联）
+    store = Store.objects.filter(user_id=user_id).first()
+    if store:
+        is_store = 1
+    else:
+        is_store = 0
+    return render(request,"store/index.html",{"is_store":is_store})
 
 # 前端注册功能用户校验
 def ajax_regValid(request):
@@ -118,5 +135,43 @@ def exit(request):
     return response
 
 
-def base(request):
-    return render(request,"store/base.html")
+def store_register(request):
+    # v1.5 新增店铺注册
+    # 查询所有的店铺类型
+    type_list = StoreType.objects.all()
+    if request.method == "POST":
+        post_data = request.POST #接收post数据
+        # print(request.FILES)
+        # print(post_data)
+        store_name = post_data.get("store_name")
+        store_address = post_data.get("store_address")
+        store_description = post_data.get("store_description")
+        store_phone = post_data.get("store_phone")
+        store_money = post_data.get("store_money")
+
+        # 通过cookie来获得user_id
+        user_id = int(request.COOKIES.get("user_id"))
+        # 通过request.post得到类型数据，是个列表
+        type_lsts = post_data.getlist("type")
+        # 通过request.FILES获取上传的图片
+        store_logo = request.FILES.get("store_logo")
+
+        # 保存正常数据
+        store = Store()
+        store.store_name = store_name
+        store.store_address = store_address
+        store.store_description = store_description
+        store.store_phone = store_phone
+        store.store_money = store_money
+        store.user_id = user_id
+        store.store_logo = store_logo
+        store.save()
+
+        # 在生成数据中添加多对多关系字段
+        for i in type_lsts:# 循环type列表，得到类型id
+            store_type = StoreType.objects.get(id=i)#查询类型数据
+            store.type.add(store_type)# 添加到类型字段，多对多的映射表
+        store.save()
+
+
+    return render(request,"store/store_register.html",locals())

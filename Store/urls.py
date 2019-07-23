@@ -11,5 +11,5 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('base/', base)
+    path('store_register/', store_register)
 ]

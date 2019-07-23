@@ -1,0 +1,46 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    后台管理首页
+{% endblock %}
+
+        {% block content %}
+        <form class="form" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                {% csrf_token %}
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_name" placeholder="店铺名称">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_address" placeholder="店铺地址">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_description" placeholder="店铺描述">
+            </div>
+            <div class="form-group">
+                <input type="file" class="form-control form-control-user"  name="store_logo" placeholder="店铺logo">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_phone" placeholder="店铺电话">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="store_money" placeholder="店铺注册资金">
+            </div>
+            <div class="form-group">
+                <select name="type" class="form-control form-control-user" multiple="multiple">
+                    {% for t in type_list %}
+                        <option value="{{ t.id }}">{{ t.store_type }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary btn-block" type="submit" value="注册">
+            </div>
+        </form>
+        {% endblock %}
+
+
+
+
+
