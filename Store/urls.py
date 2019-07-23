@@ -9,3 +9,7 @@ urlpatterns = [
     path('ajax/',ajax_regValid),
     path('exit/', exit),
 ]
+
+urlpatterns += [
+    path('base/', base)
+]

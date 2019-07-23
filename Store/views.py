@@ -116,3 +116,7 @@ def exit(request):
     response.delete_cookie("username")
     del request.session["username"]
     return response
+
+
+def base(request):
+    return render(request,"store/base.html")
