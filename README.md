@@ -1067,6 +1067,98 @@ def store_register(request):
 
 ## 六、添加商品
 
+前端页面：
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    后台管理首页
+{% endblock %}
+
+        {% block content %}
+        <form class="form" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                {% csrf_token %}
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="goods_name" placeholder="商品名称">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="goods_price" placeholder="商品价格">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="goods_image" placeholder="商品图片">
+            </div>
+            <div class="form-group">
+                <input type="file" class="form-control form-control-user"  name="goods_number" placeholder="商品库存">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="goods_description" placeholder="商品描述">
+            </div>
+
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="goods_date" placeholder="出厂日期">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control form-control-user"  name="goods_safeDate" placeholder="保质期(月)">
+            </div>
+            <div class="form-group">
+                <input type="hidden" class="form-control form-control-user"  name="store_id" value="1">
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary btn-block" type="submit" value="添加">
+            </div>
+        </form>
+        {% endblock %}
+
+
+```
+
+后端业务视图：
+
+```python
+def add_goods(request):
+    if request.method == "POST":
+        good_postData = request.POST
+        goods_name = good_postData.get("goods_name")
+        goods_price = good_postData.get("goods_price")
+        goods_number = good_postData.get("goods_number")
+        goods_description = good_postData.get("goods_description")
+        goods_date = good_postData.get("goods_date")
+        goods_safeDate = good_postData.get("goods_safeDate")
+
+        goods_image = request.FILES.get("goods_image")
+        store_id = good_postData.get("store_id")
+
+        # 保存正常数据
+        goods = Goods()
+        goods.goods_name = goods_name
+        goods.goods_price = goods_price
+        goods.goods_number = goods_number
+        goods.goods_description = goods_description
+        goods.goods_date = goods_date
+        goods.goods_safeDate = goods_safeDate
+        goods.goods_image = goods_image
+        goods.save()
+
+        # 保存多对多数据
+        goods.store_id.add(
+            Store.objects.get(id=int(store_id))
+        )
+        goods.save()
+
+
+    return render(request,"store/add_goods.html")
+```
+
+![](https://github.com/py304/DjangoShop/blob/master/images/add_goods.jpg)
+
+
+## 七、商品列表
+
+前端：
+
 
 
 

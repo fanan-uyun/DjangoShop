@@ -175,3 +175,36 @@ def store_register(request):
 
 
     return render(request,"store/store_register.html",locals())
+
+def add_goods(request):
+    if request.method == "POST":
+        good_postData = request.POST
+        goods_name = good_postData.get("goods_name")
+        goods_price = good_postData.get("goods_price")
+        goods_number = good_postData.get("goods_number")
+        goods_description = good_postData.get("goods_description")
+        goods_date = good_postData.get("goods_date")
+        goods_safeDate = good_postData.get("goods_safeDate")
+
+        goods_image = request.FILES.get("goods_image")
+        store_id = good_postData.get("store_id")
+
+        # 保存正常数据
+        goods = Goods()
+        goods.goods_name = goods_name
+        goods.goods_price = goods_price
+        goods.goods_number = goods_number
+        goods.goods_description = goods_description
+        goods.goods_date = goods_date
+        goods.goods_safeDate = goods_safeDate
+        goods.goods_image = goods_image
+        goods.save()
+
+        # 保存多对多数据
+        goods.store_id.add(
+            Store.objects.get(id=int(store_id))
+        )
+        goods.save()
+
+
+    return render(request,"store/add_goods.html")
