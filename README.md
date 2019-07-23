@@ -1222,6 +1222,35 @@ def list_goods(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/goods_list.jpg)
 
 
+## 八、添加商品列表搜索功能
+
+前端：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/search.jpg)
+
+后端：
+
+```python
+# v1.7 展示商品列表
+def list_goods(request):
+    # v1.8 添加keywords关键字字段，用户前端搜索
+    keywords = request.GET.get("keywords","")
+    if keywords:
+        # v1.8 对关键字进行模糊查询
+        goods_list = Goods.objects.filter(goods_name__contains=keywords)
+    else:
+        # v1.7 查询所有商品信息(提前添加了商品数据)
+        goods_list = Goods.objects.all()
+    return render(request,"store/goods_list.html",locals())
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/search_g.jpg)
+
+
+
+
 
 
 
