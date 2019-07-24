@@ -1421,8 +1421,135 @@ def list_goods(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/goods_s.jpg)
 
 
+## 十、商品信息修改功能实现
+
+**1、新建一个前端修改商品信息页面update_goods.html**
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    {{ goods_data.goods_name }} 详情
+{% endblock %}
+
+{% block content %}
+    <form class="form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table class="table">
+        <tr>
+            <td rowspan="3">
+                <img style="width: 200px;height: 200px;" src="/static/{{ goods_data.goods_image }}">
+                <input class="form-control form-control-user" type="file" name="goods_image">
+            </td>
+            <th>
+                商品名称
+            </th>
+            <td colspan="3">
+                <input class="form-control form-control-user" type="text" name="goods_name" value="{{ goods_data.goods_name }}">
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                商品价格
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_price" value="{{ goods_data.goods_price }}">
+            </td>
+            <th>
+                商品库存
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_number" value="{{ goods_data.goods_number }}">
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                生产日期
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_date" value="{{ goods_data.goods_date }}">
+            </td>
+            <th>
+                保质期
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_safeDate" value="{{ goods_data.goods_safeDate }}">
+            </td>
+        </tr>
+
+        <tr>
+            <th colspan="5" style="text-align: center;">商品描述</th>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <textarea class="form-control form-control-user" name="goods_description">
+                    {{ goods_data.goods_description }}
+                </textarea>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" style="text-align: center;">
+                <input class="btn btn-primary btn-block" type="submit" value="保存修改">
+            </td>
+        </tr>
+    </table>
+    </form>
+{% endblock %}
+```
+
+**2、后端简单视图及路由添加和商品详细类似，展示效果**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/update.jpg)
 
 
+**3、使用富文本编辑器修改商品描述**
+
+修改setting配置
+
+![](https://github.com/py304/DjangoShop/blob/master/images/ckeditor_app.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/ckeditor_set.jpg)
+
+修改主url
+
+![](https://github.com/py304/DjangoShop/blob/master/images/ckeditor_url.jpg)
+
+**4、收集静态文件（注意注释配置，收集后，在回复配置）**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/sj.jpg)
+
+
+**5、前端导入富文本js文件，并应用到商品描述**
+
+```html
+{# v2.1 导入ckeditor js文件，并应用到商品描述#}
+{% block script %}
+    <script src="/static/ckeditor/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace("goods_description",{uiColor:"#9AB8F3"})
+    </script>
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/save.jpg)
+
+**6、视图添加数据修改保存操作**
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/date_view.jpg)
+
+修改界面：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/date_xj.jpg)
+
+修改信息后跳转商品详情：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/date_xjx.jpg)
 
 
 

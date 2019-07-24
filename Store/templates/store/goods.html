@@ -1,7 +1,7 @@
 {% extends "store/base.html" %}
 
 {% block title %}
-    {{ goods_data.goods_name }} 详情
+    {{ goods_data.goods_name }} 修改
 {% endblock %}
 
 {% block content %}
@@ -38,13 +38,13 @@
                 生产日期
             </th>
             <td>
-                {{ goods_data.goods_date }}
+                {{ goods_data.goods_date | date:'Y-m-d'}}
             </td>
             <th>
                 保质期
             </th>
             <td>
-                {{ goods_data.goods_safeDate }}
+                {{ goods_data.goods_safeDate}}
             </td>
         </tr>
 
@@ -55,5 +55,5 @@
             <td colspan="5">{{ goods_data.goods_description }}</td>
         </tr>
     </table>
-    <a class="btn btn-primary btn-block" href="#">修改商品信息</a>
+    <a class="btn btn-primary btn-block" href="/Store/update_goods/{{ goods_data.id }}">修改商品信息</a>
 {% endblock %}

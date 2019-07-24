@@ -1,0 +1,80 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    {{ goods_data.goods_name }} 详情
+{% endblock %}
+
+{% block content %}
+    <form class="form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table class="table">
+        <tr>
+            <td rowspan="3">
+                <img style="width: 200px;height: 200px;" src="/static/{{ goods_data.goods_image }}">
+                <input class="form-control form-control-user" type="file" name="goods_image">
+            </td>
+            <th>
+                商品名称
+            </th>
+            <td colspan="3">
+                <input class="form-control form-control-user" type="text" name="goods_name" value="{{ goods_data.goods_name }}">
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                商品价格
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_price" value="{{ goods_data.goods_price }}">
+            </td>
+            <th>
+                商品库存
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_number" value="{{ goods_data.goods_number }}">
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                生产日期
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_date" value="{{ goods_data.goods_date | date:'Y-m-d' }}">
+            </td>
+            <th>
+                保质期
+            </th>
+            <td>
+                <input class="form-control form-control-user" type="text" name="goods_safeDate" value="{{ goods_data.goods_safeDate}}">
+            </td>
+        </tr>
+
+        <tr>
+            <th colspan="5" style="text-align: center;">商品描述</th>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <textarea class="form-control form-control-user" name="goods_description">
+                    {{ goods_data.goods_description }}
+                </textarea>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" style="text-align: center;">
+                <input class="btn btn-primary btn-block" type="submit" value="保存修改">
+            </td>
+        </tr>
+    </table>
+    </form>
+{% endblock %}
+
+{# v2.1 导入ckeditor js文件，并应用到商品描述#}
+{% block script %}
+    <script src="/static/ckeditor/ckeditor/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace("goods_description",{uiColor:"#9AB8F3"})
+    </script>
+{% endblock %}
