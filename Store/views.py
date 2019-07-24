@@ -236,33 +236,8 @@ def list_goods(request):
     # 返回分页数据
     return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords})
 
-
-# def list_goods(request):
-#     """
-#     商品的列表页
-#     :param request:
-#     :return:
-#     """
-#     #完成了模糊查询
-#     keywords = request.GET.get("keywords","")
-#     page_num = request.GET.get("page_num",1)
-#     referer = request.META.get("HTTP_REFERER")
-#     if keywords:
-#         goods_list = Goods.objects.filter(goods_name__contains=keywords)
-#     else:
-#         if referer and "?" in referer:
-#             get_str = referer.split("?")[1]
-#             get_list = [i.split("=") for i in get_str.split("&")]
-#             get_dict = dict(get_list)
-#             get_dict["keywords"] = get_dict["keywords"].encode()
-#             if "keywords" in get_dict:
-#                 keywords = get_dict["keywords"]
-#             goods_list = Goods.objects.filter(goods_name__contains=keywords)
-#         else:
-#             goods_list = Goods.objects.all()
-#     #完成分页查询
-#     paginator = Paginator(goods_list,3)
-#     page = paginator.page(int(page_num))
-#     page_range = paginator.page_range
-#
-#     return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords})
+# v2.0 新增展示商品详情页功能
+def goods(request,goods_id):
+    # v2.0 这里通过前端传递一个商品id来查询该商品信息
+    goods_data = Goods.objects.filter(id=goods_id).first()
+    return render(request,"store/goods.html",locals())

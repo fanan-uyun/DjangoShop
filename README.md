@@ -1,6 +1,7 @@
 [![](https://img.shields.io/badge/python-3.6.3-orange.svg)](https://www.python.org/downloads/release/python-363/)
 [![](https://img.shields.io/badge/django-2.1.8-green.svg)](https://docs.djangoproject.com/en/2.1/releases/2.1/)
 [![](https://img.shields.io/badge/jQuery-3.3.1-blue.svg)](https://code.jquery.com/jquery-3.3.1.min.js/)
+[![](https://img.shields.io/badge/Bootstrap-4.3.1-mauve.svg)](https://getbootstrap.com/)
 
 # Django电商项目
 
@@ -1338,7 +1339,86 @@ def list_goods(request):
 
 
 
+## 九、商品详情页添加
 
+**1、新建一个商品详情页面goods.html**
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    {{ goods_data.goods_name }} 详情
+{% endblock %}
+
+{% block content %}
+    <table class="table">
+        <tr>
+            <td rowspan="3">
+                <img style="width: 200px;height: 200px;" src="/static/{{ goods_data.goods_image }}">
+            </td>
+            <th>
+                商品名称
+            </th>
+            <td colspan="3">
+                {{ goods_data.goods_name }}
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                商品价格
+            </th>
+            <td>
+                {{ goods_data.goods_price }}
+            </td>
+            <th>
+                商品库存
+            </th>
+            <td>
+                {{ goods_data.goods_number }}
+            </td>
+        </tr>
+
+        <tr>
+            <th>
+                生产日期
+            </th>
+            <td>
+                {{ goods_data.goods_date }}
+            </td>
+            <th>
+                保质期
+            </th>
+            <td>
+                {{ goods_data.goods_safeDate }}
+            </td>
+        </tr>
+
+        <tr>
+            <th colspan="5" style="text-align: center;">商品描述</th>
+        </tr>
+        <tr>
+            <td colspan="5">{{ goods_data.goods_description }}</td>
+        </tr>
+    </table>
+    <a class="btn btn-primary btn-block" href="#">修改商品信息</a>
+{% endblock %}
+```
+
+**2、视图，路由**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods.jpg)
+
+
+**3、在列表页绑定路由**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_a.jpg)
+
+**4、通过点击商品列表中的商品跳转到商品详情页**
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_s.jpg)
 
 
 

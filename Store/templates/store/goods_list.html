@@ -24,7 +24,9 @@
 {#            {% for goods in goods_list %}#}
             {% for goods in page %}
             <tr align="center">
-                <td>{{ goods.goods_name }}</td>
+                <td>
+                    <a href="/Store/goods/{{ goods.id }}">{{ goods.goods_name }}</a>
+                </td>
                 <td>
                     <input type="text" value="{{ goods.goods_price }}" style="text-align: center">
                 </td>
