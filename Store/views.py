@@ -62,6 +62,14 @@ def login(request):
                     # v1.5 添加下发user_id的cookie
                     response.set_cookie("user_id", seller.id)
                     request.session["username"] = seller.username
+                    # v2.2 新增下发是否有店铺的cookie
+                    # v2.2 先查询店铺是否存在
+                    store = Store.objects.filter(user_id=seller.id).first()
+                    # v2.2 再下发cookie
+                    if store:
+                        response.set_cookie("is_store",store.id)
+                    else:
+                        response.set_cookie("is_store","")
                     result["status"] = "success"
                     result["data"] = "登录成功"
                     return response
@@ -88,7 +96,18 @@ def loginValid(fun):
             seller = Seller.objects.filter(username=c_user).first()
             # 如果有这个用户，则返回函数，这里只index
             if seller:
-                return fun(request,*args,**kwargs)
+                # v2.2 获取当前页面cookie中的user_id
+                user_id = request.COOKIES.get("user_id")
+                # v2.2 被装饰函数返回作为一个响应(这里意思：先保存店铺）
+                response = fun(request, *args, **kwargs)
+                # v2.2 通过该user_id去查询该用户有无店铺(再去查询有无该店铺)
+                store = Store.objects.filter(user_id=int(user_id)).first()
+                # 判断店铺是否存在，进行相应的cookie下发，这里注意cookie下发之后，如果是数字，不论是0还是false都为字符串类型，都是True
+                if store:
+                    response.set_cookie("is_store",store.id)
+                else:
+                    response.set_cookie("is_store","")
+                return response
         # 否则重定向到登录页面
         return HttpResponseRedirect("/Store/login/")
     return inner
@@ -100,18 +119,18 @@ def index(request):
     v1.5 添加检测账号是否有店铺的逻辑
     """
     # 查询当前用户
-    user_id = request.COOKIES.get("user_id")
-    if user_id:
-        user_id = int(user_id)
-    else:
-        user_id = 0
-    # 通过用户查询店铺是否存在（店铺和用户通过用户的id进行关联）
-    store = Store.objects.filter(user_id=user_id).first()
-    if store:
-        is_store = 1
-    else:
-        is_store = 0
-    return render(request,"store/index.html",{"is_store":is_store})
+    # user_id = request.COOKIES.get("user_id")
+    #     # if user_id:
+    #     #     user_id = int(user_id)
+    #     # else:
+    #     #     user_id = 0
+    #     # # 通过用户查询店铺是否存在（店铺和用户通过用户的id进行关联）
+    #     # store = Store.objects.filter(user_id=user_id).first()
+    #     # if store:
+    #     #     is_store = store.id
+    #     # else:
+    #     #     is_store = ""
+    return render(request,"store/index.html")
 
 # 前端注册功能用户校验
 def ajax_regValid(request):
@@ -136,7 +155,7 @@ def exit(request):
     del request.session["username"]
     return response
 
-
+@loginValid
 def store_register(request):
     # v1.5 新增店铺注册
     # 查询所有的店铺类型
@@ -174,7 +193,7 @@ def store_register(request):
             store_type = StoreType.objects.get(id=i)#查询类型数据
             store.type.add(store_type)# 添加到类型字段，多对多的映射表
         store.save()
-
+        return HttpResponseRedirect('/Store/index/')
 
     return render(request,"store/store_register.html",locals())
 
@@ -221,12 +240,18 @@ def list_goods(request):
     keywords = request.GET.get("keywords","")
     # v1.9 获取前端页码,默认页码1
     page_num = request.GET.get("page_num",1)
+    # v2.3 查询店铺
+    store_id = request.COOKIES.get("is_store")
+    store = Store.objects.get(id=int(store_id))
     if keywords:
         # v1.8 对关键字进行模糊查询
-        goods_list = Goods.objects.filter(goods_name__contains=keywords)
+        # goods_list = Goods.objects.filter(goods_name__contains=keywords)
+        # v2.3 使用多对多关系查询，查询当前商铺的商品
+        goods_list = store.goods_set.filter(goods_name__contains=keywords)
     else:
         # v1.7 查询所有商品信息(提前添加了商品数据)
-        goods_list = Goods.objects.all()
+        # goods_list = Goods.objects.all()
+        goods_list = store.goods_set.all()
     # v1.9 新增列表分页功能，创建分页器,针对good_list中的数据，每页3条数据
     paginator = Paginator(goods_list,3)
     # v1.9 获取具体页的数据
@@ -234,7 +259,7 @@ def list_goods(request):
     # v1.9 返回页码列表
     page_range = paginator.page_range
     # 返回分页数据
-    return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords})
+    return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords,"store_name":store.store_name})
 
 # def list_goods(request):
 #     """

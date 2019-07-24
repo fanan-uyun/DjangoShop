@@ -1,7 +1,7 @@
 {% extends "store/base.html" %}
 
 {% block title %}
-    后台管理首页
+    添加商品页面
 {% endblock %}
 
 {% block content %}
@@ -32,7 +32,7 @@
         <input type="text" class="form-control form-control-user"  name="goods_safeDate" placeholder="保质期(月)">
     </div>
     <div class="form-group">
-        <input type="hidden" class="form-control form-control-user"  name="store_id" value="1">
+        <input type="hidden" class="form-control form-control-user"  name="store_id" value="{{ request.COOKIES.is_store }}">
     </div>
     <div class="form-group">
         <input class="btn btn-primary btn-block" type="submit" value="添加">

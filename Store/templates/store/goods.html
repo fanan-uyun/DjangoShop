@@ -52,7 +52,7 @@
             <th colspan="5" style="text-align: center;">商品描述</th>
         </tr>
         <tr>
-            <td colspan="5">{{ goods_data.goods_description }}</td>
+            <td colspan="5">{{ goods_data.goods_description | safe }}</td>
         </tr>
     </table>
     <a class="btn btn-primary btn-block" href="/Store/update_goods/{{ goods_data.id }}">修改商品信息</a>

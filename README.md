@@ -1540,18 +1540,169 @@ def list_goods(request):
 
 **6、视图添加数据修改保存操作**
 
-
-![](https://github.com/py304/DjangoShop/blob/master/images/date_view.jpg)
+![](https://github.com/py304/DjangoShop/blob/master/images/update_view.jpg)
 
 修改界面：
 
-![](https://github.com/py304/DjangoShop/blob/master/images/date_xj.jpg)
+![](https://github.com/py304/DjangoShop/blob/master/images/update_xj.jpg)
 
 修改信息后跳转商品详情：
 
-![](https://github.com/py304/DjangoShop/blob/master/images/date_xjx.jpg)
+![](https://github.com/py304/DjangoShop/blob/master/images/update_xjx.jpg)
 
 
+## 十一、校验用户是否有商铺功能
+
+**1、在用户登录时下发校验店铺的cookie**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/store_cookie.jpg)
+
+**2、在base页重新进行前端店铺校验**
+
+```html
+    <!-- Sidebar -->
+    {% if request.COOKIES.is_store %}
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">后台管理系统</div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item">
+{#        {% if is_store %}#}
+        <a class="nav-link" href="#">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>店铺管理</span></a>
+{#        {% else %}#}
+{#        <a class="nav-link" href="/Store/store_register/">#}
+{#          <i class="fas fa-fw fa-tachometer-alt"></i>#}
+{#                <span>没有店铺，注册一个</span></a>#}
+{#        {% endif %}#}
+
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <!-- Heading -->
+      <div class="sidebar-heading">
+        销售管理
+      </div>
+
+      <!-- Nav Item - Pages Collapse Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>商品管理</span>
+        </a>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">商品信息:</h6>
+            <a class="collapse-item" href="/Store/add_good/">添加商品</a>
+            <a class="collapse-item" href="/Store/goods_list/">商品列表</a>
+          </div>
+        </div>
+      </li>
+
+      <!-- Nav Item - Utilities Collapse Menu -->
+
+      <!-- Divider -->
+{#      <hr class="sidebar-divider">#}
+
+      <!-- Nav Item - Charts -->
+{#      <li class="nav-item">#}
+{#        <a class="nav-link" href="charts.html">#}
+{#          <i class="fas fa-fw fa-chart-area"></i>#}
+{#          <span>图表</span></a>#}
+{#      </li>#}
+
+      <!-- Nav Item - Tables -->
+{#      <li class="nav-item">#}
+{#        <a class="nav-link" href="tables.html">#}
+{#          <i class="fas fa-fw fa-table"></i>#}
+{#          <span>表格</span></a>#}
+{#      </li>#}
+
+      <!-- Divider -->
+{#      <hr class="sidebar-divider d-none d-md-block">#}
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+    {% else %}
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">后台管理系统</div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item">
+        <a class="nav-link" href="/Store/store_register/">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>没有店铺，注册一个</span></a>
+      </li>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    {% endif %}
+```
+
+**3、后端更新装饰器店铺cookie下发并装饰到店铺注册函数视图上**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/valid_up.jpg)
+
+
+效果展示：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/none.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/none1.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/none2.jpg)
+
+
+## 十二、业务逻辑实现：查看商品列表是针对当前用户的店铺
+
+**1、更改添加商品页面的店铺id为自动获取cookie，每次添加商品的时候就会自动关联当前页面cookie中的店铺id**
+
+```html
+    <div class="form-group">
+        <input type="hidden" class="form-control form-control-user"  name="store_id" value="{{ request.COOKIES.is_store }}">
+    </div>
+```
+
+**2、修改后端商品列表视图，使用多对多关系反向查询**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/current_good.jpg)
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/current_list.jpg)
 
 
 
