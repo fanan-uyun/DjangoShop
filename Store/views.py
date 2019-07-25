@@ -374,3 +374,29 @@ def set_goods(request,state):
             goods.goods_under = state_num
             goods.save()
     return HttpResponseRedirect(referer)
+
+# v2.8 后台新增商品类型管理，进行商品类型的添加
+def goods_type_list(request):
+    # v2.8 查询现有的商品类型，渲染到前端
+    goods_type_lst = GoodsType.objects.all()
+    # 判断请求方式，并获取从模态框传过来的商品类型数据
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        picture = request.FILES.get("picture")
+
+        # 实例化商品类型，开始添加类型保存
+        goods_type = GoodsType()
+        goods_type.name = name
+        goods_type.description = description
+        goods_type.picture = picture
+        goods_type.save()
+    return render(request,"store/goods_type_list.html",locals())
+
+# v2.8 删除商品类型
+def delete_goods_type(request):
+    # 前端通过参数id={{goods_type.id}来获取要删除类型对象
+    id = int(request.GET.get("id"))
+    goods_type = GoodsType.objects.get(id=id)
+    goods_type.delete()
+    return HttpResponseRedirect('/Store/list_goods_type/')

@@ -2005,7 +2005,138 @@ def index(request):
 
 
 
+## 十五、后台新增添加商品类型的功能（使用模态框）
 
+**1、在后台base模板页新增“商品类型管理”选项**
+
+```html
+<li class="nav-item">
+<a class="nav-link collapsed" href="/Store/list_goods_type/">
+  <i class="fas fa-fw fa-cog"></i>
+  <span>商品类型管理</span>
+</a>
+</li>
+```
+
+**2、新建一个商品类型管理html文件**
+这里的使用bootstrap模态框进行实现，模板样式基本固定
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    商品类型管理
+{% endblock %}
+
+{% block label %}
+    <button class="btn btn-warning" data-toggle="modal" data-target="#myModal">添加商品类型</button>
+{% endblock %}
+
+{% block content %}
+<table class="table">
+<thead>
+    <tr>
+        <th style="text-align: center;">商品类型名称</th>
+        <th style="text-align: center;">商品类型描述</th>
+        <th style="text-align: center;">操作</th>
+    </tr>
+</thead>
+
+<tbody>
+    {% for goods_type in goods_type_lst%}
+    <tr>
+        <td style="text-align: center;">{{ goods_type.name }}</td>
+        <td style="text-align: center;">{{ goods_type.description }}</td>
+        <td style="text-align: center;">
+            <a class="btn btn-danger" href="/Store/delete_goods_type/?id={{ goods_type.id }}">删除</a>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+
+{#    <div class="dataTables_paginate paging_simple_numbers">#}
+{#        <ul class="pagination">#}
+{#            {% for p in page_range %}#}
+{#            <li class="paginate_button page-item">#}
+{#                <a class="page-link" href="?keywords={{ keywords }}&page_num={{ p }}">{{ p }}</a>#}
+{#            </li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    </div>#}
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title" id="myModalLabel">添加类型</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        </div>
+<form method="post" class="form">
+    <div class="modal-body">
+        {% csrf_token %}
+        <div class="form-group">
+            <input type="text" name="name" class="form-control form-control-user" placeholder="类型名称">
+        </div>
+        <div class="form-group">
+            <input type="text" name="description" class="form-control form-control-user" placeholder="类型描述">
+        </div>
+        <div class="form-group">
+            <input type="file" name="picture" class="form-control form-control-user" placeholder="类型图片">
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">保存类型</button>
+    </div>
+</form>
+    </div>
+</div>
+</div>
+{% endblock %}
+```
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goodstypelist.jpg)
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_b.jpg)
+
+**3、商品类型管理视图、路由配置**
+
+```python
+# v2.8 后台新增商品类型管理，进行商品类型的添加
+def goods_type_list(request):
+    # v2.8 查询现有的商品类型，渲染到前端
+    goods_type_lst = GoodsType.objects.all()
+    # 判断请求方式，并获取从模态框传过来的商品类型数据
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+        picture = request.FILES.get("picture")
+
+        # 实例化商品类型，开始添加类型保存
+        goods_type = GoodsType()
+        goods_type.name = name
+        goods_type.description = description
+        goods_type.picture = picture
+        goods_type.save()
+    return render(request,"store/goods_type_list.html",locals())
+```
+
+删除商品类型视图及前端路径
+
+```python
+# v2.8 删除商品类型
+def delete_goods_type(request):
+    # 前端通过参数id={{goods_type.id}来获取要删除类型对象
+    id = int(request.GET.get("id"))
+    goods_type = GoodsType.objects.get(id=id)
+    goods_type.delete()
+    return HttpResponseRedirect('/Store/list_goods_type/')
+```
+
+```html
+<a class="btn btn-danger" href="/Store/delete_goods_type/?id={{ goods_type.id }}">删除</a>
+```
 
 
 

@@ -1,0 +1,71 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    商品类型管理
+{% endblock %}
+
+{% block label %}
+    <button class="btn btn-warning" data-toggle="modal" data-target="#myModal">添加商品类型</button>
+{% endblock %}
+
+{% block content %}
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align: center;">商品类型名称</th>
+                <th style="text-align: center;width: 800px">商品类型描述</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for goods_type in goods_type_lst%}
+            <tr>
+                <td style="text-align: center;">{{ goods_type.name }}</td>
+                <td style="text-align: center;">{{ goods_type.description }}</td>
+                <td style="text-align: center;">
+                    <a class="btn btn-danger" href="/Store/delete_goods_type/?id={{ goods_type.id }}">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{#    <div class="dataTables_paginate paging_simple_numbers">#}
+{#        <ul class="pagination">#}
+{#            {% for p in page_range %}#}
+{#            <li class="paginate_button page-item">#}
+{#                <a class="page-link" href="?keywords={{ keywords }}&page_num={{ p }}">{{ p }}</a>#}
+{#            </li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    </div>#}
+
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">添加类型</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <form method="post" class="form">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input type="text" name="name" class="form-control form-control-user" placeholder="类型名称">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="description" class="form-control form-control-user" placeholder="类型描述">
+                        </div>
+                        <div class="form-group">
+                            <input type="file" name="picture" class="form-control form-control-user" placeholder="类型图片">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">保存类型</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -8,14 +8,16 @@ urlpatterns = [
     re_path(r'^$',index),
     path('ajax/',ajax_regValid),
     path('exit/', exit),
-    re_path(r'goods_list/(?P<state>\w+)/', list_goods),
-    re_path(r'set_goods/(?P<state>\w+)/', set_goods),
+    path('store_register/', store_register),
+    path('add_good/', add_goods),
+    path('list_goods_type/', goods_type_list),
+    path('delete_goods_type/', delete_goods_type),
+
 ]
 
 urlpatterns += [
-    path('store_register/', store_register),
-    path('add_good/', add_goods),
-
     re_path(r'^goods/(?P<goods_id>\d+)', goods),
-    re_path(r'update_goods/(?P<goods_id>\d+)', update_goods)
+    re_path(r'update_goods/(?P<goods_id>\d+)', update_goods),
+    re_path(r'goods_list/(?P<state>\w+)/', list_goods),
+    re_path(r'set_goods/(?P<state>\w+)/', set_goods),
 ]
