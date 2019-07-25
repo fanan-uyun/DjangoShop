@@ -39,7 +39,8 @@ class Goods(models.Model):
     goods_description = models.TextField(verbose_name="商品描述")
     goods_date = models.DateField(verbose_name="出厂日期")
     goods_safeDate = models.IntegerField(verbose_name="保质期")
-
+    # v2.4 新增商品状态字段;1 待售 0 下架
+    goods_under = models.IntegerField(verbose_name="商品状态",default=1)
     store_id = models.ManyToManyField(to=Store,verbose_name="商品店铺")
 
 # 定义商品图片类

@@ -8,6 +8,7 @@ urlpatterns = [
     re_path(r'^$',index),
     path('ajax/',ajax_regValid),
     path('exit/', exit),
+    path('goods_under/', under_goods),
 ]
 
 urlpatterns += [

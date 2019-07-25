@@ -1705,6 +1705,48 @@ def list_goods(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/current_list.jpg)
 
 
+## 十三、商品下架功能
+
+**1、商品模型类添加商品状态字段,并同步数据库**
+
+```python
+# v2.4 新增商品状态字段;1 待售 0 下架
+    goods_under = models.IntegerField(verbose_name="商品状态",default=1)
+```
+
+**2、更改商品列表视图，是查询上架商品**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/under.jpg)
+
+
+**3、新增商品下架视图函数**
+
+```python
+# v2.4 新增商品上架功能
+def under_goods(request):
+    id = request.GET.get("id")
+    # v2.4 返回当前请求的来源地址
+    referer = request.META.get("HTTP_REFERER")
+    if id:
+        # v2.4 获取指定id的商品
+        goods = Goods.objects.filter(id=id).first()
+        # v2.4 修改商品状态
+        goods.goods_under = 0
+        goods.save()
+    return HttpResponseRedirect(referer)
+```
+
+**4、更新商品列表前端页面下架标签**
+
+```html
+<a class="btn btn-danger" href="/Store/goods_under/?id={{ goods.id }}">下架</a>
+```
+
+
+
+## 十三、商品上架及销毁功能
+
+
 
 
 

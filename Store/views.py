@@ -247,11 +247,13 @@ def list_goods(request):
         # v1.8 对关键字进行模糊查询
         # goods_list = Goods.objects.filter(goods_name__contains=keywords)
         # v2.3 使用多对多关系查询，查询当前商铺的商品
-        goods_list = store.goods_set.filter(goods_name__contains=keywords)
+        # v2.4 新增商品状态查询字段，前端只显示上架商品
+        goods_list = store.goods_set.filter(goods_name__contains=keywords,goods_under=1)
     else:
         # v1.7 查询所有商品信息(提前添加了商品数据)
         # goods_list = Goods.objects.all()
-        goods_list = store.goods_set.all()
+        # goods_list = store.goods_set.all()
+        goods_list = store.goods_set.filter(goods_under=1)
     # v1.9 新增列表分页功能，创建分页器,针对good_list中的数据，每页3条数据
     paginator = Paginator(goods_list,3)
     # v1.9 获取具体页的数据
@@ -328,3 +330,17 @@ def update_goods(request, goods_id):
         return HttpResponseRedirect('/Store/goods/%s/'%goods_id)
 
     return render(request, "store/update_goods.html", locals())
+
+
+# v2.4 新增商品上架功能
+def under_goods(request):
+    id = request.GET.get("id")
+    # v2.4 返回当前请求的来源地址
+    referer = request.META.get("HTTP_REFERER")
+    if id:
+        # v2.4 获取指定id的商品
+        goods = Goods.objects.filter(id=id).first()
+        # v2.4 修改商品状态
+        goods.goods_under = 0
+        goods.save()
+    return HttpResponseRedirect(referer)
