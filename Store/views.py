@@ -85,31 +85,43 @@ def login(request):
     return response
 
 # 用户登录校验装饰器
+# def loginValid(fun):
+#     def inner(request,*args,**kwargs):
+#         # 获取成功登录后的cookie和session
+#         c_user = request.COOKIES.get("username")
+#         s_user = request.session.get("username")
+#         # 如果cookie和session都存在并且值都相同
+#         if c_user and s_user and c_user == s_user:
+#             # 通过c_user查询数据库
+#             seller = Seller.objects.filter(username=c_user).first()
+#             # 如果有这个用户，则返回函数，这里只index
+#             if seller:
+#                 # v2.2 获取当前页面cookie中的user_id
+#                 user_id = request.COOKIES.get("user_id")
+#                 # v2.2 被装饰函数返回作为一个响应(这里意思：先保存店铺）
+#                 response = fun(request, *args, **kwargs)
+#                 # v2.2 通过该user_id去查询该用户有无店铺(再去查询有无该店铺)
+#                 store = Store.objects.filter(user_id=int(user_id)).first()
+#                 # 判断店铺是否存在，进行相应的cookie下发，这里注意cookie下发之后，如果是数字，不论是0还是false都为字符串类型，都是True
+#                 if store:
+#                     response.set_cookie("is_store",store.id)
+#                 else:
+#                     response.set_cookie("is_store","")
+#                 return response
+#         # 否则重定向到登录页面
+#         return HttpResponseRedirect("/Store/login/")
+#     return inner
+
+
+
 def loginValid(fun):
     def inner(request,*args,**kwargs):
-        # 获取成功登录后的cookie和session
         c_user = request.COOKIES.get("username")
         s_user = request.session.get("username")
-        # 如果cookie和session都存在并且值都相同
         if c_user and s_user and c_user == s_user:
-            # 通过c_user查询数据库
-            seller = Seller.objects.filter(username=c_user).first()
-            # 如果有这个用户，则返回函数，这里只index
-            if seller:
-                # v2.2 获取当前页面cookie中的user_id
-                user_id = request.COOKIES.get("user_id")
-                # v2.2 被装饰函数返回作为一个响应(这里意思：先保存店铺）
-                response = fun(request, *args, **kwargs)
-                # v2.2 通过该user_id去查询该用户有无店铺(再去查询有无该店铺)
-                store = Store.objects.filter(user_id=int(user_id)).first()
-                # 判断店铺是否存在，进行相应的cookie下发，这里注意cookie下发之后，如果是数字，不论是0还是false都为字符串类型，都是True
-                if store:
-                    response.set_cookie("is_store",store.id)
-                else:
-                    response.set_cookie("is_store","")
-                return response
-        # 否则重定向到登录页面
-        return HttpResponseRedirect("/Store/login/")
+            return fun(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect("/Store/login/")
     return inner
 
 # 首页
@@ -151,7 +163,8 @@ def ajax_regValid(request):
 # 退出功能（删除cookie)
 def exit(request):
     response = HttpResponseRedirect("/Store/login/")
-    response.delete_cookie("username")
+    for key in request.COOKIES: # 获取当前所有cookie
+        response.delete_cookie(key)
     del request.session["username"]
     return response
 
@@ -193,7 +206,11 @@ def store_register(request):
             store_type = StoreType.objects.get(id=i)#查询类型数据
             store.type.add(store_type)# 添加到类型字段，多对多的映射表
         store.save()
-        return HttpResponseRedirect('/Store/index/')
+        # 数据保存成功后跳转到主页
+        response = HttpResponseRedirect('/Store/index/')
+        # 下发cookie证明当前用户有店铺
+        response.set_cookie("is_store",store.id)
+        return response
 
     return render(request,"store/store_register.html",locals())
 
