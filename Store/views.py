@@ -230,12 +230,16 @@ def add_goods(request):
             Store.objects.get(id=int(store_id))
         )
         goods.save()
-        return HttpResponseRedirect('/Store/goods_list/')
+        return HttpResponseRedirect('/Store/goods_list/up/')
 
     return render(request,"store/add_goods.html")
 
-# v1.7 展示商品列表
-def list_goods(request):
+# v1.7 展示商品列表 v2.5 新增上下架页面参数
+def list_goods(request,state):
+    if state == "up":
+        state_num = 1
+    else:
+        state_num = 0
     # v1.8 添加keywords关键字字段，用户前端搜索
     keywords = request.GET.get("keywords","")
     # v1.9 获取前端页码,默认页码1
@@ -248,12 +252,12 @@ def list_goods(request):
         # goods_list = Goods.objects.filter(goods_name__contains=keywords)
         # v2.3 使用多对多关系查询，查询当前商铺的商品
         # v2.4 新增商品状态查询字段，前端只显示上架商品
-        goods_list = store.goods_set.filter(goods_name__contains=keywords,goods_under=1)
+        goods_list = store.goods_set.filter(goods_name__contains=keywords,goods_under=state_num)
     else:
         # v1.7 查询所有商品信息(提前添加了商品数据)
         # goods_list = Goods.objects.all()
         # goods_list = store.goods_set.all()
-        goods_list = store.goods_set.filter(goods_under=1)
+        goods_list = store.goods_set.filter(goods_under=state_num)
     # v1.9 新增列表分页功能，创建分页器,针对good_list中的数据，每页3条数据
     paginator = Paginator(goods_list,3)
     # v1.9 获取具体页的数据
@@ -261,7 +265,7 @@ def list_goods(request):
     # v1.9 返回页码列表
     page_range = paginator.page_range
     # 返回分页数据
-    return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords,"store_name":store.store_name})
+    return render(request,"store/goods_list.html",{"page":page,"page_range":page_range,"keywords":keywords,"store_name":store.store_name,"state":state})
 
 # def list_goods(request):
 #     """
@@ -333,14 +337,23 @@ def update_goods(request, goods_id):
 
 
 # v2.4 新增商品上架功能
-def under_goods(request):
+def set_goods(request,state):
+    # v2.5 使该视图同时具备上下架及销毁的功能
+    if state == "up":
+        state_num = 1
+    else:
+        state_num = 0
     id = request.GET.get("id")
     # v2.4 返回当前请求的来源地址
     referer = request.META.get("HTTP_REFERER")
     if id:
         # v2.4 获取指定id的商品
         goods = Goods.objects.filter(id=id).first()
-        # v2.4 修改商品状态
-        goods.goods_under = 0
-        goods.save()
+        # v2.5 判断前端路由中的字段参数来进行相应的操作，这里如果为delete，删除该商品
+        if state == "delete":
+            goods.delete()
+        else:
+            # v2.4 修改商品状态
+            goods.goods_under = state_num
+            goods.save()
     return HttpResponseRedirect(referer)

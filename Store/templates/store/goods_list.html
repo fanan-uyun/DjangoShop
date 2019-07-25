@@ -34,8 +34,12 @@
                 <td>{{ goods.goods_date }}</td>
                 <td>{{ goods.goods_safeDate }}</td>
                 <td>
-                    <a class="btn btn-danger" href="/Store/goods_under/?id={{ goods.id }}">下架</a>
-                    <a class="btn btn-primary" href="#">销毁</a>
+                    {% ifequal state 'up' %}
+                    <a class="btn btn-danger" href="/Store/set_goods/down/?id={{ goods.id }}">下架</a>
+                    {% else %}
+                    <a class="btn btn-danger" href="/Store/set_goods/up/?id={{ goods.id }}">上架</a>
+                    {% endifequal %}
+                    <a class="btn btn-primary" href="/Store/set_goods/delete/?id={{ goods.id }}">销毁</a>
                 </td>
             </tr>
             {% endfor %}

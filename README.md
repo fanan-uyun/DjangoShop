@@ -1746,9 +1746,59 @@ def under_goods(request):
 
 ## 十三、商品上架及销毁功能
 
+**1、base页新增下架商品的列表**
+
+```html
+  <div class="bg-white py-2 collapse-inner rounded">
+            <h6 class="collapse-header">商品信息:</h6>
+            <a class="collapse-item" href="/Store/add_good/">添加商品</a>
+            <a class="collapse-item" href="/Store/goods_list/up/">在售商品列表</a>
+            <a class="collapse-item" href="/Store/goods_list/down/">下架商品列表</a>
+          </div>
+```
+
+**2、为了使上下架商品列表不出现代码冗余，对商品列表视图及前端进行状态判断**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/under_list.jpg)
+
+```html
+{% ifequal state 'up' %}
+   <a class="btn btn-danger" href="/Store/set_goods/down/?id={{ goods.id }}">下架</a>
+{% else %}
+   <a class="btn btn-danger" href="/Store/set_goods/up/?id={{ goods.id }}">上架</a>
+{% endifequal %}
+   <a class="btn btn-primary" href="/Store/set_goods/delete/?id={{ goods.id }}">销毁</a>
+```
+
+**3、将前面的under_goods视图该为set_goods,对页面上下架按钮提交做判断进行相应的处理**
+
+```
+python
+# v2.4 新增商品上架功能
+def set_goods(request,state):
+    # v2.5 使该视图同时具备上下架及销毁的功能
+    if state == "up":
+        state_num = 1
+    else:
+        state_num = 0
+    id = request.GET.get("id")
+    # v2.4 返回当前请求的来源地址
+    referer = request.META.get("HTTP_REFERER")
+    if id:
+        # v2.4 获取指定id的商品
+        goods = Goods.objects.filter(id=id).first()
+        # v2.5 判断前端路由中的字段参数来进行相应的操作，这里如果为delete，删除该商品
+        if state == "delete":
+            goods.delete()
+        else:
+            # v2.4 修改商品状态
+            goods.goods_under = state_num
+            goods.save()
+    return HttpResponseRedirect(referer)
+```
 
 
-
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_under.jpg)
 
 
 
