@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponseRedirect
 
 from Store.views import setPassword
 from Buyer.models import *
+from Store.models import *
 
 
 # Create your views here.
@@ -57,8 +58,9 @@ def loginValid(fun):
     return inner
 
 # v2.6 前台用户首页
-@loginValid
+# @loginValid
 def index(request):
+    goods_type_list = GoodsType.objects.all()
     return render(request,"buyer/index.html",locals())
 
 # v2.6 前台用户注销

@@ -13,17 +13,19 @@
 			<div class="welcome fl">欢迎来到天天生鲜!</div>
 			<div class="fr">
 				<div class="login_info fl">
-					欢迎您：<em>张 山</em>
+					欢迎您：<em>{{ request.COOKIES.username }}</em>
 				</div>
                 {% if request.COOKIES.username %}
                 <div class="login_btn fl">
+                    <a href="">{{ request.COOKIES.username }}</a>
+					<span>|</span>
 					<a href="/Buyer/logout/">退出</a>
 				</div>
                 {% else %}
 				<div class="login_btn fl">
-					<a href="login.html">登录</a>
+					<a href="/Buyer/login/">登录</a>
 					<span>|</span>
-					<a href="register.html">注册</a>
+					<a href="/Buyer/register/">注册</a>
 				</div>
                 {% endif %}
 				<div class="user_link fl">

@@ -1921,7 +1921,87 @@ base页cookie功能校验顶部功能，如果用户登录，就显示退出，�
 {% endif %}
 ```
 
+## 十四、后台新增新增商品类型模型，并在商品表中添加关联外键商品类型字段**
 
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_type.jpg)
+
+为了避免后续大数据出现差错，我先手动去添加一个商品类型，网上选取4张商品图片作为一个类型的演示
+
+![](https://github.com/py304/DjangoShop/blob/master/images/type_data.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/good.jpg)
+
+前台index视图添加查询商品类型的语句，先导入后端模型类
+
+```python
+def index(request):
+    goods_type_list = GoodsType.objects.all()
+    return render(request,"buyer/index.html",locals())
+```
+
+然后在index前端页面进行类型及类型中商品的循环展示
+
+```html
+{% block content %}
+<div class="center_con clearfix">
+<ul class="subnav fl">
+	<li><a href="#model01" class="fruit">新鲜水果</a></li>
+	<li><a href="#model02" class="seafood">海鲜水产</a></li>
+	<li><a href="#model03" class="meet">猪牛羊肉</a></li>
+	<li><a href="#model04" class="egg">禽类蛋品</a></li>
+	<li><a href="#model05" class="vegetables">新鲜蔬菜</a></li>
+	<li><a href="#model06" class="ice">速冻食品</a></li>
+</ul>
+
+<div class="slide fl">
+	<ul class="slide_pics">
+		<li><img src="/static/buyer/images/slide.jpg" alt="幻灯片"></li>
+		<li><img src="/static/buyer/images/slide02.jpg" alt="幻灯片"></li>
+		<li><img src="/static/buyer/images/slide03.jpg" alt="幻灯片"></li>
+		<li><img src="/static/buyer/images/slide04.jpg" alt="幻灯片"></li>
+	</ul>
+	<div class="prev"></div>
+	<div class="next"></div>
+	<ul class="points"></ul>
+</div>
+<div class="adv fl">
+	<a href="#"><img src="/static/buyer/images/adv01.jpg"></a>
+	<a href="#"><img src="/static/buyer/images/adv02.jpg"></a>
+</div>
+</div>
+{% for goods_type in goods_type_list %}
+<div class="list_model">
+<div class="list_title clearfix">
+	<h3 class="fl" id="model01">{{ goods_type.name }}</h3>
+	<div class="subtitle fl">
+		<span>|</span>
+		<a href="#">鲜芒</a>
+		<a href="#">加州提子</a>
+		<a href="#">亚马逊牛油果</a>
+	</div>
+	<a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
+</div>
+
+<div class="goods_con clearfix">
+	<div class="goods_banner fl"><img src="/static/buyer/images/banner01.jpg"></div>
+	<ul class="goods_list fl">
+        {% for goods in goods_type.goods_set.all %}
+		<li>
+			<h4><a href="#">{{ goods.goods_name }}</a></h4>
+			<a href="#"><img src="/static/{{ goods.goods_image }}"></a>
+			<div class="prize">¥ {{ goods.goods_price }}</div>
+		</li>
+        {% endfor %}
+	</ul>
+</div>
+</div>
+{% endfor %}
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/index_goods.jpg)
 
 
 
