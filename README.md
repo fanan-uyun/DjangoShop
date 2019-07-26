@@ -2257,3 +2257,125 @@ def goods_list(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/goods_list4.jpg)
 
 
+## 十九、支付宝沙箱环境部署并测试
+
+**1、打开支付宝开发平台地址并扫码登录**
+https://open.alipay.com/platform/home.htm
+
+**2、确定入驻身份填写信息，完成入驻**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay1.jpg)
+
+**3、进入开发中心，开发阶段先用沙箱环境进行测试**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay2.jpg)
+
+**4、进入沙箱环境，查看沙箱应用**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay3.jpg)
+
+**5、下载沙箱版支付宝（仅安卓版本）**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay4.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay5.jpg)
+
+**6、打开支付宝开发文档然后查看开发手册，进行开发**
+
+https://docs.open.alipay.com/
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay6.jpg)
+
+生成RSA公钥，下载生成工具
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay7.jpg)
+
+下载完成进行解压并打开RSA签名验签工具生成公私钥
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay8.jpg)
+
+同时在生成工具的目录下RSA秘钥目录下也有文件版本
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay9.jpg)
+
+然后将公钥设置到服务端
+
+![](https://github.com/py304/DjangoShop/blob/master/images/rsa1.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/rsa2.jpg)
+
+查看接入手册,接入当前开发业务类型接口
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay10.jpg)
+
+使用快速接入，下载服务端SDK
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay11.jpg)
+
+**7、下载支付宝SDK开发的python模块**
+
+支付流程：
+- 接收订单
+- 跳转请求支付宝
+- 接收，并将支付页面发给买家
+- 买家完成付款
+
+pip install pycryptodome 安装依赖包
+
+![](https://github.com/py304/DjangoShop/blob/master/images/down1.jpg)
+
+pip install python-alipay-sdk --upgrade 安装支付宝SDK
+
+![](https://github.com/py304/DjangoShop/blob/master/images/down2.jpg)
+
+**8、安装完成编写脚本测试支付功能**
+
+```python
+from alipay import AliPay
+
+alipay_public_key_string = """-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAv66JqpsopyoXYMiWiIgyV4O/nc4ptXjRgZO9dkKRzsh1LusdILASoXlZ65nx/4ONCDpFn5QEQQNerVtmCW+Y9N/GmNnQOsEeX5tCxfNlg7vHS5Hk8QDCgIbEzVC3K+9wwYiCc8aQRjSM+Czb/Tq3kI+XJpDIGE6lPtp2zkwZaPt3y8yt88MpYcqPllNn3acEW8U5LnQmMHosohqlXu5iPK57OC7a0oC5AwUPlZcMizO2EqmxonWpfqk+scOhVdyVUwuX6siye76OkUuhO8M1758hhhNOUhmzhurEEW20toqA2eoMP63GweyTt5kWmWcqc30YU0FAN8Aq3QG03wF3xQIDAQAB
+-----END PUBLIC KEY-----"""
+
+app_private_key_string = """-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAv66JqpsopyoXYMiWiIgyV4O/nc4ptXjRgZO9dkKRzsh1LusdILASoXlZ65nx/4ONCDpFn5QEQQNerVtmCW+Y9N/GmNnQOsEeX5tCxfNlg7vHS5Hk8QDCgIbEzVC3K+9wwYiCc8aQRjSM+Czb/Tq3kI+XJpDIGE6lPtp2zkwZaPt3y8yt88MpYcqPllNn3acEW8U5LnQmMHosohqlXu5iPK57OC7a0oC5AwUPlZcMizO2EqmxonWpfqk+scOhVdyVUwuX6siye76OkUuhO8M1758hhhNOUhmzhurEEW20toqA2eoMP63GweyTt5kWmWcqc30YU0FAN8Aq3QG03wF3xQIDAQABAoIBAHSkuL+qJcX79jf+OKSjBMd+s/dKwtTczdklV5EEl4gXMkA38QS4QM4kc5TMnJgZrJQKKd4fC6uoak/iI6iwUYsKNedD/NQUOvCBIdQl9muAtJmHEaObC8F8wXwTlzPURHBxKrlbZuZiCjrnyYNC3PvKdXeReUJZcXNbLBsD8h6QgVOPaKXnLCSTZf98gHXkDN0IWlNp08143b4Xp6DO+CiaUHUbUrAcHdB+gHQJnN3+YP3dnVGzvyRisjJ8B8mTS1zPk4fpciViA6EMCYLHFCrS+8LZ+WEpJN8o/0o9Mgpd8YPKg1q4WDlYp1ulnRUVqOkJaVZVOvecTtbPbyaJWUECgYEA9fj7peww3VmPNYS3WAAtm/M5YMgsuFNRWC61/o+FKDSVlH57dVRRTnnGF7NE5dUHldloAa+yBw5Zbi/s5LjYV36zvga4dYZpA8Lt4uglzg3QAXwQ+X5YRqkde1gGolOdU/MsnhvehQpdOoZ5XWzJHe/2kA8RNraZyYsER0PQ2hECgYEAx373L2VZZdhPT8EIrgrAU93izxZAS9Cp5A/whogxmVhaKfGHcJa4YygajzyKd3DRoSmYtbXqysGXZyY+RmolCyMeZEBZ1s/2DTj2vtdh3ngV6UQY4vbgpCBgDCOnoiAq/5whcFcTDjma79BmsdHng/ZXgo+5U6v4TrKdZ7ay7nUCgYEArEZnkk175/xLFjPO6d6uExTmMgfhcnRAe9+zbgh9PayeuzNfKs0UaT9W49CWR9bNikGL2+p/aPu+3TLJ22QvehBuuYAhf4bVVGIZlRv9JnV8Ix4PEX9ROqRF1tbPRrADeAHQVSi10D5zD4ORy0JfFg20hi9XYhfAXG12YKd5xtECgYB8t3A6ziZsWCWFG42cmJYSGDYx9pwtiX6cWCarRDuVvTlo3Vkp1t/hBXJNN7Ds6Lf1A/c3KkplhU9sqejmxnbwFn1qeRxxAcO2EnWXazkBBpvUH8FbKrHXiXHiROwInAmlkOsKuzTrgLHO2L9KzYnp4rhkpAtdNrZeJKXo77u+/QKBgF4DmigjHYR32dmKXZQYp2DkM7lFxnuL6McR0r/5b/wkMUPSInCK4n4e8vBH611dkaNNhNSTR5aVsrMZuBGzQrFOGnXawa+PxpGPaVwR/jf/tPCLmsq2KPenQPF15tc+4dosMp726+f+4Klg71qMK8yjGN+fkrHo3Er1y+35Letj
+-----END RSA PRIVATE KEY-----"""
+
+# v3.2 实例化支付应用
+alipay = AliPay(
+    appid = "2016101000652510",
+    app_notify_url = None,
+    app_private_key_string = app_private_key_string,
+    alipay_public_key_string = alipay_public_key_string,
+    sign_type= "RSA2"
+)
+
+# v3.2 发起支付请求
+order_string = alipay.api_alipay_trade_page_pay(
+    out_trade_no="33456", #订单号
+    total_amount=str(1000.01),#支付金额
+    subject="生鲜交易", #交易主题
+    return_url=None,
+    notify_url=None
+)
+
+print("https://openapi.alipaydev.com/gateway.do?"+order_string)
+```
+
+运行该脚本，会生成一个链接点击它，效果如下：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay12.jpg)
+
+使用沙箱版支付宝支付：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/pay13.jpg)
+
+现在开放平台中的沙箱环境的商家账号已经有金额入账了，表示测试成功
+
+
+
+
+
+
+
+
