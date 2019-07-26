@@ -48,7 +48,7 @@
                     <h4 class="modal-title" id="myModalLabel">添加类型</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 </div>
-                <form method="post" class="form">
+                <form method="post" class="form" enctype="multipart/form-data">
                     <div class="modal-body">
                         {% csrf_token %}
                         <div class="form-group">

@@ -2139,8 +2139,21 @@ def delete_goods_type(request):
 ```
 
 
+## 十六、后台添加商品功能的前后端添加商品类型字段
 
+后端：
 
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_add1.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_add2.jpg)
+
+前端：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_add3.jpg)
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_add4.jpg)
 
 
 

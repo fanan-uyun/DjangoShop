@@ -45,7 +45,7 @@
 		</div>
 
 		<div class="goods_con clearfix">
-			<div class="goods_banner fl"><img src="/static/buyer/images/banner01.jpg"></div>
+			<div class="goods_banner fl"><img src="/static/{{ goods_type.picture }}"></div>
 			<ul class="goods_list fl">
                 {% for goods in goods_type.goods_set.all %}
 				<li>

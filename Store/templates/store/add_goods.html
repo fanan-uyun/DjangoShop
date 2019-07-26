@@ -34,6 +34,14 @@
     <div class="form-group">
         <input type="hidden" class="form-control form-control-user"  name="store_id" value="{{ request.COOKIES.is_store }}">
     </div>
+    <!--v2.9新增商品类型字段-->
+    <div class="form-group">
+        <select class="form-control form-control-user"  name="goods_type">
+            {% for goods_type in goods_type_list %}
+            <option value="{{ goods_type.id }}">{{ goods_type.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
     <div class="form-group">
         <input class="btn btn-primary btn-block" type="submit" value="添加">
     </div>

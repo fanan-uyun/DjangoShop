@@ -216,6 +216,8 @@ def store_register(request):
 
 # v1.6添加商品
 def add_goods(request):
+    # v2.9 添加商品页面增加商品类型选项，查询所有商品类型
+    goods_type_list = GoodsType.objects.all()
     if request.method == "POST":
         # v1.6 获取前端post请求数据
         good_postData = request.POST
@@ -230,6 +232,8 @@ def add_goods(request):
         goods_image = request.FILES.get("goods_image")
         # v1.6 多对多关系字段，前端使用隐藏域
         store_id = good_postData.get("store_id")
+        # v2.9 新增商品类型字段，并获取前端数据
+        goods_type = good_postData.get("goods_type")
 
         # 保存正常数据
         goods = Goods() # 实例化一个商品对象
@@ -240,6 +244,8 @@ def add_goods(request):
         goods.goods_date = goods_date
         goods.goods_safeDate = goods_safeDate
         goods.goods_image = goods_image
+        # v2.9 保存商品类型，注意一对多关系，一条数据
+        goods.goods_type = GoodsType.objects.get(id=int(goods_type))
         goods.save() # 保存一条记录
 
         # 保存多对多数据(注意get方式获取到的数据为字符串)
@@ -249,7 +255,7 @@ def add_goods(request):
         goods.save()
         return HttpResponseRedirect('/Store/goods_list/up/')
 
-    return render(request,"store/add_goods.html")
+    return render(request,"store/add_goods.html",locals())
 
 # v1.7 展示商品列表 v2.5 新增上下架页面参数
 def list_goods(request,state):
@@ -379,6 +385,7 @@ def set_goods(request,state):
 def goods_type_list(request):
     # v2.8 查询现有的商品类型，渲染到前端
     goods_type_lst = GoodsType.objects.all()
+
     # 判断请求方式，并获取从模态框传过来的商品类型数据
     if request.method == "POST":
         name = request.POST.get("name")
