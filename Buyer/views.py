@@ -60,7 +60,25 @@ def loginValid(fun):
 # v2.6 前台用户首页
 # @loginValid
 def index(request):
+    # v3.0 定义一个容器用来存放结果
+    result_list = []
+    # v2.9 查询所有商品类型
     goods_type_list = GoodsType.objects.all()
+    # v3.0 循环类型
+    for goods_type in goods_type_list:
+        # v3.0 这个查询出来是个QuerySet列表套字典类型，但是前面的商品类型没有对应，所有手动构建数据
+        goods_list = goods_type.goods_set.values()[:4]  # 取前4条商品信息
+        if goods_list:# 如果类型有对应的商品
+            # v3.0 构建输出结果
+            goodsType = {
+                "id":goods_type.id,
+                "name":goods_type.name,
+                "description":goods_type.description,
+                "picture":goods_type.picture,
+                "goods_list":goods_list
+            }
+            # v3.0 查询商品类型当中有数据的数据，将有数据的类型及数据放入定义的列表中
+            result_list.append(goodsType)
     return render(request,"buyer/index.html",locals())
 
 # v2.6 前台用户注销

@@ -31,7 +31,8 @@
 			<a href="#"><img src="/static/buyer/images/adv02.jpg"></a>
 		</div>
 	</div>
-    {% for goods_type in goods_type_list %}
+{#    {% for goods_type in goods_type_list %}#}
+    {% for goods_type in result_list %}
 	<div class="list_model">
 		<div class="list_title clearfix">
 			<h3 class="fl" id="model01">{{ goods_type.name }}</h3>
@@ -47,7 +48,8 @@
 		<div class="goods_con clearfix">
 			<div class="goods_banner fl"><img src="/static/{{ goods_type.picture }}"></div>
 			<ul class="goods_list fl">
-                {% for goods in goods_type.goods_set.all %}
+{#                {% for goods in goods_type.goods_set.all %}#}
+                {% for goods in goods_type.goods_list %}
 				<li>
 					<h4><a href="#">{{ goods.goods_name }}</a></h4>
 					<a href="#"><img src="/static/{{ goods.goods_image }}"></a>

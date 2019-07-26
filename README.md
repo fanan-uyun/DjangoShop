@@ -2156,5 +2156,50 @@ def delete_goods_type(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/goods_add4.jpg)
 
 
+## 十七、前台商品首页列表展示优化
 
+查询所有有数据的商品类型，并且只返回4种商品展示在首页
+
+后台首页视图业务处理：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_list1.jpg)
+
+前台首页循环：
+
+```html
+{#    {% for goods_type in goods_type_list %}#}
+    {% for goods_type in result_list %}
+	<div class="list_model">
+		<div class="list_title clearfix">
+			<h3 class="fl" id="model01">{{ goods_type.name }}</h3>
+			<div class="subtitle fl">
+				<span>|</span>
+				<a href="#">鲜芒</a>
+				<a href="#">加州提子</a>
+				<a href="#">亚马逊牛油果</a>
+			</div>
+			<a href="#" class="goods_more fr" id="fruit_more">查看更多 ></a>
+		</div>
+
+		<div class="goods_con clearfix">
+			<div class="goods_banner fl"><img src="/static/{{ goods_type.picture }}"></div>
+			<ul class="goods_list fl">
+{#                {% for goods in goods_type.goods_set.all %}#}
+                {% for goods in goods_type.goods_list %}
+				<li>
+					<h4><a href="#">{{ goods.goods_name }}</a></h4>
+					<a href="#"><img src="/static/{{ goods.goods_image }}"></a>
+					<div class="prize">¥ {{ goods.goods_price }}</div>
+				</li>
+                {% endfor %}
+			</ul>
+		</div>
+	</div>
+    {% endfor %}
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_list2.jpg)
 
