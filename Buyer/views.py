@@ -89,7 +89,21 @@ def logout(request):
     del request.session["username"]
     return response
 
-
+# v3.1 前台商品列表展示
+def goods_list(request):
+    """
+    前台列表页
+    :param request:
+    :return:
+    """
+    goodsList = []
+    type_id = request.GET.get("type_id")
+    # v3.1 获取商品类型
+    goods_type = GoodsType.objects.filter(id = type_id).first()
+    if goods_type:
+        # v3.1 查询所有上架的产品
+        goodsList = goods_type.goods_set.filter(goods_under=1)
+    return render(request,"buyer/goods_list.html",locals())
 
 def base(request):
     return render(request,"buyer/base.html")

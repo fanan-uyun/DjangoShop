@@ -2203,3 +2203,57 @@ def delete_goods_type(request):
 
 ![](https://github.com/py304/DjangoShop/blob/master/images/goods_list2.jpg)
 
+## 十八、前台商品列表展示
+
+新建列表html文档，继承模板,并使用后端数据渲染
+
+```html
+<ul class="goods_type_list clearfix">
+{% for goods in goodsList%}
+<li>
+	<a href="detail.html"><img src="/static/{{ goods.goods_image }}"></a>
+	<h4><a href="detail.html">{{ goods.goods_name }}</a></h4>
+	<div class="operate">
+		<span class="prize">￥{{ goods.goods_price }}</span>
+		<span class="unit">{{ goods.goods_price }}/500g</span>
+		<a href="#" class="add_goods" title="加入购物车"></a>
+	</div>
+</li>
+{% endfor %}
+</ul>
+```
+
+编写前台商品列表视图，通过“首页查看更多链接”跳转列表页面，查询当前商品类型下的所有商品
+
+```python
+# v3.1 前台商品列表展示
+def goods_list(request):
+    """
+    前台列表页
+    :param request:
+    :return:
+    """
+    goodsList = []
+    type_id = request.GET.get("type_id")
+    # v3.1 获取商品类型
+    goods_type = GoodsType.objects.filter(id = type_id).first()
+    if goods_type:
+        # v3.1 查询所有上架的产品
+        goodsList = goods_type.goods_set.filter(goods_under=1)
+    return render(request,"buyer/goods_list.html",locals())
+```
+
+首页查看更多链接添加商品列表路由
+
+```html
+<a href="/Buyer/goods_list/?type_id={{ goods_type.id }}" class="goods_more fr" id="fruit_more">查看更多 ></a>
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_list3.jpg)
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_list4.jpg)
+
+
