@@ -95,7 +95,7 @@
             }
             var price = $("#price").text();
             var total_price = value * price;
-            $("#total").text(total_price);
+            $("#total").text(total_price.toFixed(2));
         }
     </script>
 {% endblock %}

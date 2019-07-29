@@ -51,8 +51,8 @@
 {#                {% for goods in goods_type.goods_set.all %}#}
                 {% for goods in goods_type.goods_list %}
 				<li>
-					<h4><a href="#">{{ goods.goods_name }}</a></h4>
-					<a href="#"><img src="/static/{{ goods.goods_image }}"></a>
+					<h4><a href="/Buyer/goods_detail/?goods_id={{ goods.id }}">{{ goods.goods_name }}</a></h4>
+					<a href="/Buyer/goods_detail/?goods_id={{ goods.id }}"><img src="/static/{{ goods.goods_image }}"></a>
 					<div class="prize">¥ {{ goods.goods_price }}</div>
 				</li>
                 {% endfor %}

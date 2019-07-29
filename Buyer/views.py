@@ -148,6 +148,8 @@ def place_order(request):
         order.goods_count = count
         order.order_user = Buyer.objects.get(id=user_id)
         order.order_price = count * price
+        # v3.7 添加订单状态字段
+        order.order_status = 1
         order.save()
 
         # 创建订单详情
@@ -161,7 +163,7 @@ def place_order(request):
         order_detail.goods_store = store_id
         order_detail.goods_image = goods.goods_image
         order_detail.save()
-
+        # 因为order_detail可能不止一个商品，所以使用列表存储
         detail = [order_detail]
         return render(request,"buyer/place_order.html",locals())
     else:
@@ -203,6 +205,10 @@ def pay_order(request):
         # v3.3 支付完成要跳转的异步路由
         notify_url="http://127.0.0.1:8000/Buyer/pay_result/"
     )
+    # v3.7 添加支付成功后订单状态置为2待发货
+    order = Order.objects.get(order_id=order_id)
+    order.order_status = 2
+    order.save()
     # v3.3 发起购买商品跳转支付路由
     return HttpResponseRedirect("https://openapi.alipaydev.com/gateway.do?" + order_string)
 

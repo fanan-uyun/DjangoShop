@@ -12,6 +12,7 @@ urlpatterns = [
     path('add_good/', add_goods),
     path('list_goods_type/', goods_type_list),
     path('delete_goods_type/', delete_goods_type),
+    path('order_list/', order_list), # v3.7 订单列表页
 
 ]
 

@@ -1,0 +1,42 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    订单列表
+{% endblock %}
+
+
+
+{% block content %}
+    <table class="table-bordered table">
+        <thead>
+            <tr align="center">
+                <th>订单编号</th>
+                <th>订单商品</th>
+                <th>订单金额</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in page %}
+            <tr align="center">
+                <td>{{ order.order_id.order_id }}</td>
+                <td>{{ order.goods_name }}</td>
+                <td>{{ order.goods_total }}</td>
+                <td>
+                    <a class="btn btn-primary" href="#">确认发货</a>
+                    <a class="btn btn-danger" href="#">拒绝发货</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            {% for p in page_range %}
+            <li class="paginate_button page-item ">
+                <a class="page-link" href="?page_num={{ p }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

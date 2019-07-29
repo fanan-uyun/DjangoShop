@@ -2913,3 +2913,121 @@ def place_order(request):
 然后从后台到前台重新测试一遍，无误
 
 
+## 二十四、后台订单管理系统
+
+**1、后台base页添加订单管理选项**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/store_order1.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/store_order2.jpg)
+
+**2、参照后台商品列表页构建订单列表页**
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    订单列表
+{% endblock %}
+
+
+
+{% block content %}
+    <table class="table-bordered table">
+        <thead>
+            <tr align="center">
+                <th>订单编号</th>
+                <th>订单商品</th>
+                <th>订单金额</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in page %}
+            <tr align="center">
+                <td>{{ order.order_id.order_id }}</td>
+                <td>{{ order.goods_name }}</td>
+                <td>{{ order.goods_total }}</td>
+                <td>
+                    <a class="btn btn-primary" href="#">确认发货</a>
+                    <a class="btn btn-danger" href="#">拒绝发货</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            {% for p in page_range %}
+            <li class="paginate_button page-item ">
+                <a class="page-link" href="?page_num={{ p }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+```
+
+
+**3、后台订单列表视图**
+
+```python
+# v3.7 新增订单管理
+def order_list(request):
+    # 获取前端页码,默认页码1
+    page_num = request.GET.get("page_num", 1)
+    # 获取当前商铺id
+    store_id = request.COOKIES.get("is_store")
+    order_list = OrderDetail.objects.filter(goods_store=store_id)
+    # 创建分页器
+    paginator = Paginator(order_list, 5)
+    # 获取具体页的数据
+    page = paginator.page(int(page_num))
+    # 返回页码列表
+    page_range = paginator.page_range
+    return render(request,"store/order_list.html",locals())
+
+```
+
+![](https://github.com/py304/DjangoShop/blob/master/images/store_order3.jpg)
+
+**4、前台订单模型添加“订单状态”字段并同步数据库**
+
+```python
+# v3.7 添加订单状态：未支付1；待发货2；已发货3；已收货4；已退货0
+order_status = models.IntegerField(default=1,verbose_name="订单状态")
+```
+
+**5、后台订单管理视图修改，查询当前未处理（未发货）的订单列表**
+
+这里的使用Django ORM 双下划线跨表查询
+
+```python
+# 查询当前店铺待发货（2）的订单
+order_list = OrderDetail.objects.filter(goods_store=store_id,order_id__order_status=2)
+```
+
+**6、补充：前台生成订单的时候订单状态字段**
+
+生成订单时未支付状态：
+
+order.order_status = 1
+
+**7、支付之后订单状态变为待发货（2）**
+
+支付视图：
+
+```python
+# v3.7 添加支付成功后订单状态置为2待发货
+order = Order.objects.get(order_id=order_id)
+order.order_status = 2
+order.save()
+```
+
+gif展示商品购买支付效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/order_pay.gif)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/order_pay1.jpg)
+
+

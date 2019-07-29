@@ -26,6 +26,8 @@ class Order(models.Model):
     order_user = models.ForeignKey(to=Buyer,on_delete=models.CASCADE,verbose_name="订单用户")
     order_address = models.ForeignKey(to=Address,on_delete=models.CASCADE,verbose_name="订单地址",blank=True,null=True)
     order_price = models.FloatField(verbose_name="订单总价")
+    # v3.7 添加订单状态：未支付1；待发货2；已发货3；已收货4；已退货0
+    order_status = models.IntegerField(default=1,verbose_name="订单状态")
 
 # v3.5 订单详情
 class OrderDetail(models.Model):

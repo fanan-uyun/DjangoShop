@@ -7,7 +7,7 @@ from django.core.paginator import Paginator  # v1.9 导入分页模块
 
 
 from Store.models import *
-
+from Buyer.models import *
 # Create your views here.
 # 密码加密功能
 def setPassword(password):
@@ -410,6 +410,21 @@ def delete_goods_type(request):
     goods_type.delete()
     return HttpResponseRedirect('/Store/list_goods_type/')
 
+# v3.7 新增订单管理
+def order_list(request):
+    # 获取前端页码,默认页码1
+    page_num = request.GET.get("page_num", 1)
+    # 获取当前商铺id
+    store_id = request.COOKIES.get("is_store")
+    # 查询当前店铺待发货（2）的订单
+    order_list = OrderDetail.objects.filter(goods_store=store_id,order_id__order_status=2)
+    # 创建分页器
+    paginator = Paginator(order_list, 5)
+    # 获取具体页的数据
+    page = paginator.page(int(page_num))
+    # 返回页码列表
+    page_range = paginator.page_range
+    return render(request,"store/order_list.html",locals())
 
 def base(request):
     return render(request,"store/base.html")
