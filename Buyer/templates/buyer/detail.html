@@ -23,19 +23,23 @@
 				<span class="show_pirze">¥<em id="price">{{ goods.goods_price }}</em></span>
 				<span class="show_unit">单  位：500g</span>
 			</div>
+            <form method="post" action="/Buyer/place_order/">
+            {% csrf_token %}
 			<div class="goods_num clearfix">
 				<div class="num_name fl">数 量：</div>
 				<div class="num_add fl">
-					<input type="text" id="count" class="num_show fl" value="1">
+					<input type="text" id="count" name="count" class="num_show fl" value="1">
+					<input type="hidden" id="goods_id" name="goods_id" class="num_show fl" value="{{ goods.id }}">
 					<a href="javascript:;" onclick="changecount('add')" class="add fr">+</a>
 					<a href="javascript:;" onclick="changecount('minus')" class="minus fr">-</a>
 				</div>
 			</div>
 			<div class="total">总价：<em id="total">{{ goods.goods_price }}</em><em>元</em></div>
 			<div class="operate_btn">
-				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<input type="submit" class="buy_btn" value="立即购买">
 				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>
 			</div>
+            </form>
 		</div>
 	</div>
 

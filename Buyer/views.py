@@ -1,3 +1,5 @@
+import time
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import HttpResponseRedirect
@@ -117,6 +119,53 @@ def goods_detail(request):
         if goods:
             return render(request, "buyer/detail.html",locals())
     return HttpResponse("没有您指定的商品")
+
+# v3.5 订单号生成函数
+def setOrder(user_id,goods_id,store_id):
+    strtime = time.strftime("%Y%m%d%H%M%S",time.localtime())
+    return strtime+user_id+goods_id+store_id
+
+# v3.5 订单详情
+def place_order(request):
+    # 判断商品详情页加入购买后的提交方式
+    if request.method == "POST":
+        # 商品详情页添加了两个input
+        # post数据
+        count = int(request.POST.get("count"))
+        goods_id = request.POST.get("goods_id")
+        # cookie数据
+        user_id = request.COOKIES.get("user_id")
+        # 数据库数据
+        goods = Goods.objects.get(id=int(goods_id))
+        store_id = goods.store_id.get(id = 7).id
+        price = goods.goods_price
+
+        # 创建一个订单
+        order = Order()
+        order.order_id = setOrder(str(user_id),str(goods_id),str(store_id))
+        order.goods_count = count
+        order.order_user = Buyer.objects.get(id=user_id)
+        order.order_price = count * price
+        order.save()
+
+        # 创建订单详情
+        order_detail = OrderDetail()
+        order_detail.order_id = order
+        order_detail.goods_id = goods_id
+        order_detail.goods_name = goods.goods_name
+        order_detail.goods_price = goods.goods_price
+        order_detail.goods_number = count
+        order_detail.goods_total = count * goods.goods_price
+        order_detail.goods_store = store_id
+        order_detail.goods_image = goods.goods_image
+        order_detail.save()
+
+        detail = [order_detail]
+        return render(request,"buyer/place_order.html",locals())
+    else:
+        return HttpResponse("非法请求")
+
+
 
 # v3.3 将支付宝接口应用到前台付款,并用get请求发送支付金额和订单id
 def pay_order(request):

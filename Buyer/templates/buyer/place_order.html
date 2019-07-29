@@ -1,0 +1,84 @@
+{% extends "buyer/base.html" %}
+
+{% block title %}
+    订单详情
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block order %}
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;提交订单</div>
+{% endblock %}
+
+{% block car %}{% endblock %}
+
+{% block search %}
+    <div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h3 class="common_title">确认收货地址</h3>
+
+	<div class="common_list_con clearfix">
+		<dl>
+			<dt>寄送到：</dt>
+			<dd><input type="radio" name="" checked="">北京市 海淀区 东北旺西路8号中关村软件园 （李思 收） 182****7528</dd>
+		</dl>
+		<a href="user_center_site.html" class="edit_site">编辑收货地址</a>
+
+	</div>
+
+	<h3 class="common_title">支付方式</h3>
+	<div class="common_list_con clearfix">
+		<div class="pay_style_con clearfix">
+			<input type="radio" name="pay_style" checked>
+			<label class="cash">货到付款</label>
+			<input type="radio" name="pay_style">
+			<label class="weixin">微信支付</label>
+			<input type="radio" name="pay_style">
+			<label class="zhifubao"></label>
+			<input type="radio" name="pay_style">
+			<label class="bank">银行卡支付</label>
+		</div>
+	</div>
+
+	<h3 class="common_title">商品列表</h3>
+
+	<div class="common_list_con clearfix">
+		<ul class="goods_list_th clearfix">
+			<li class="col01">商品名称</li>
+			<li class="col02">商品单位</li>
+			<li class="col03">商品价格</li>
+			<li class="col04">数量</li>
+			<li class="col05">小计</li>
+		</ul>
+        {% for d in detail %}
+		<ul class="goods_list_td clearfix">
+			<li class="col01">{{ forloop.counter }}</li>
+			<li class="col02"><img src="/static/{{ d.goods_image }}"></li>
+			<li class="col03">{{ d.goods_name }}</li>
+			<li class="col04">500g</li>
+			<li class="col05">{{ d.goods_price }}元</li>
+			<li class="col06">{{ d.goods_number }}</li>
+			<li class="col07">{{ d.goods_total }}元</li>
+		</ul>
+        {% endfor %}
+	</div>
+
+	<h3 class="common_title">总金额结算</h3>
+
+	<div class="common_list_con clearfix">
+		<div class="settle_con">
+			<div class="total_goods_count">共<em>{{ order.goods_count }}</em>件商品，总金额<b>{{ order.order_price }}元</b></div>
+			<div class="transit">运费：<b>0元</b></div>
+			<div class="total_pay">实付款：<b>{{ order.order_price }}元</b></div>
+		</div>
+	</div>
+
+	<div class="order_submit clearfix">
+		<a href="/Buyer/pay_order/?money={{ order.order_price }}&order_id={{ order.order_id }}" id="order_btn">提交订单</a>
+	</div>
+{% endblock %}

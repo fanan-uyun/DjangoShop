@@ -2613,3 +2613,274 @@ def goods_detail(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/detail2.gif)
 
 
+## 二十二、商品订单模型创建
+
+订单和地址有多对一关系
+订单单纯的用一个表定义不够
+订单里面可以有多种商品
+所以订单需要两个表
+
+订单表
+- order id订单编号
+- goods_count商品数量
+- order_user订单用户 (多对一)
+- order_address订单地址(多对一)
+- order_price订单总价
+
+
+订单详情表 （详情和订单是多对一）
+- order_id 订单编号(多对一)
+- goods_id 商品id
+- goods_name 商品名称
+- goods_price 商品价格（单价）
+- goods_number 商品的购买数量
+- goods_total 商品总价(单个商品)
+- goods_store 商品的店铺
+
+
+**1、创建订单模型类并同步数据库**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/order1.jpg)
+
+**2、新建订单详情页，继承base页，并依据原生模板添加块标签内容**
+
+```html
+{% extends "buyer/base.html" %}
+
+{% block title %}
+    订单详情
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block order %}
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;提交订单</div>
+{% endblock %}
+
+{% block car %}{% endblock %}
+
+{% block search %}
+    <div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h3 class="common_title">确认收货地址</h3>
+
+	<div class="common_list_con clearfix">
+		<dl>
+			<dt>寄送到：</dt>
+			<dd><input type="radio" name="" checked="">北京市 海淀区 东北旺西路8号中关村软件园 （李思 收） 182****7528</dd>
+		</dl>
+		<a href="user_center_site.html" class="edit_site">编辑收货地址</a>
+
+	</div>
+
+	<h3 class="common_title">支付方式</h3>
+	<div class="common_list_con clearfix">
+		<div class="pay_style_con clearfix">
+			<input type="radio" name="pay_style" checked>
+			<label class="cash">货到付款</label>
+			<input type="radio" name="pay_style">
+			<label class="weixin">微信支付</label>
+			<input type="radio" name="pay_style">
+			<label class="zhifubao"></label>
+			<input type="radio" name="pay_style">
+			<label class="bank">银行卡支付</label>
+		</div>
+	</div>
+
+	<h3 class="common_title">商品列表</h3>
+
+	<div class="common_list_con clearfix">
+		<ul class="goods_list_th clearfix">
+			<li class="col01">商品名称</li>
+			<li class="col02">商品单位</li>
+			<li class="col03">商品价格</li>
+			<li class="col04">数量</li>
+			<li class="col05">小计</li>
+		</ul>
+		<ul class="goods_list_td clearfix">
+			<li class="col01">1</li>
+			<li class="col02"><img src="images/goods/goods012.jpg"></li>
+			<li class="col03">奇异果</li>
+			<li class="col04">500g</li>
+			<li class="col05">25.80元</li>
+			<li class="col06">1</li>
+			<li class="col07">25.80元</li>
+		</ul>
+		<ul class="goods_list_td clearfix">
+			<li class="col01">2</li>
+			<li class="col02"><img src="images/goods/goods003.jpg"></li>
+			<li class="col03">大兴大棚草莓</li>
+			<li class="col04">500g</li>
+			<li class="col05">16.80元</li>
+			<li class="col06">1</li>
+			<li class="col07">16.80元</li>
+		</ul>
+	</div>
+
+	<h3 class="common_title">总金额结算</h3>
+
+	<div class="common_list_con clearfix">
+		<div class="settle_con">
+			<div class="total_goods_count">共<em>2</em>件商品，总金额<b>42.60元</b></div>
+			<div class="transit">运费：<b>10元</b></div>
+			<div class="total_pay">实付款：<b>52.60元</b></div>
+		</div>
+	</div>
+
+	<div class="order_submit clearfix">
+		<a href="javascript:;" id="order_btn">提交订单</a>
+	</div>
+{% endblock %}
+```
+
+**3、编写订单详情列表视图**
+
+```python
+# v3.5 订单详情
+def place_order(request):
+    # 判断商品详情页加入购买后的提交方式
+    if request.method == "POST":
+        # 商品详情页添加了两个input
+        # post数据
+        count = int(request.POST.get("count"))
+        goods_id = request.POST.get("goods_id")
+        # cookie数据
+        user_id = request.COOKIES.get("user_id")
+        # 数据库数据
+        goods = Goods.objects.get(id=int(goods_id))
+        store_id = goods.store_id.get(id = 7).id
+        price = goods.goods_price
+
+        # 创建一个订单
+        order = Order()
+        order.order_id = setOrder(str(user_id),str(goods_id),str(store_id))
+        order.goods_count = count
+        order.order_user = Buyer.objects.get(id=user_id)
+        order.order_price = count * price
+        order.save()
+
+        # 创建订单详情
+        order_detail = OrderDetail()
+        order_detail.order_id = order
+        order_detail.goods_id = goods_id
+        order_detail.goods_name = goods.goods_name
+        order_detail.goods_price = goods.goods_price
+        order_detail.goods_number = count
+        order_detail.goods_total = count * goods.goods_price
+        order_detail.goods_store = store_id
+        order_detail.goods_image = goods.goods_image
+        order_detail.save()
+
+        detail = [order_detail]
+        return render(request,"buyer/place_order.html",locals())
+    else:
+        return HttpResponse("非法请求")
+```
+
+**4、前端详情页数据渲染**
+
+```html
+{% extends "buyer/base.html" %}
+
+{% block title %}
+    订单详情
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block order %}
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;提交订单</div>
+{% endblock %}
+
+{% block car %}{% endblock %}
+
+{% block search %}
+    <div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h3 class="common_title">确认收货地址</h3>
+
+	<div class="common_list_con clearfix">
+		<dl>
+			<dt>寄送到：</dt>
+			<dd><input type="radio" name="" checked="">北京市 海淀区 东北旺西路8号中关村软件园 （李思 收） 182****7528</dd>
+		</dl>
+		<a href="user_center_site.html" class="edit_site">编辑收货地址</a>
+
+	</div>
+
+	<h3 class="common_title">支付方式</h3>
+	<div class="common_list_con clearfix">
+		<div class="pay_style_con clearfix">
+			<input type="radio" name="pay_style" checked>
+			<label class="cash">货到付款</label>
+			<input type="radio" name="pay_style">
+			<label class="weixin">微信支付</label>
+			<input type="radio" name="pay_style">
+			<label class="zhifubao"></label>
+			<input type="radio" name="pay_style">
+			<label class="bank">银行卡支付</label>
+		</div>
+	</div>
+
+	<h3 class="common_title">商品列表</h3>
+
+	<div class="common_list_con clearfix">
+		<ul class="goods_list_th clearfix">
+			<li class="col01">商品名称</li>
+			<li class="col02">商品单位</li>
+			<li class="col03">商品价格</li>
+			<li class="col04">数量</li>
+			<li class="col05">小计</li>
+		</ul>
+        {% for d in detail %}
+		<ul class="goods_list_td clearfix">
+			<li class="col01">{{ forloop.counter }}</li>
+			<li class="col02"><img src="/static/{{ d.goods_image }}"></li>
+			<li class="col03">{{ d.goods_name }}</li>
+			<li class="col04">500g</li>
+			<li class="col05">{{ d.goods_price }}元</li>
+			<li class="col06">{{ d.goods_number }}</li>
+			<li class="col07">{{ d.goods_total }}元</li>
+		</ul>
+        {% endfor %}
+	</div>
+
+	<h3 class="common_title">总金额结算</h3>
+
+	<div class="common_list_con clearfix">
+		<div class="settle_con">
+			<div class="total_goods_count">共<em>{{ order.goods_count }}</em>件商品，总金额<b>{{ order.order_price }}元</b></div>
+			<div class="transit">运费：<b>0元</b></div>
+			<div class="total_pay">实付款：<b>{{ order.order_price }}元</b></div>
+		</div>
+	</div>
+
+	<div class="order_submit clearfix">
+		<a href="/Buyer/pay_order/?money={{ order.order_price }}&order_id={{ order.order_id }}" id="order_btn">提交订单</a>
+	</div>
+{% endblock %}
+```
+
+效果：
+
+点击立即购买跳转到订单详情：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/order2.jpg)
+
+订单详情，提交订单，跳转支付页面：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/order3.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/order4.jpg)
+
+

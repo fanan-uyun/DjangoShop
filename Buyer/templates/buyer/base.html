@@ -42,16 +42,21 @@
 
 	<div class="search_bar clearfix">
 		<a href="index.html" class="logo fl"><img src="/static/buyer/images/logo.png"></a>
+        {% block order %}{% endblock %}
+        {% block search %}
 		<div class="search_con fl">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
 			<input type="button" class="input_btn fr" name="" value="搜索">
 		</div>
+        {% endblock %}
+        {% block car %}
 		<div class="guest_cart fr">
 			<a href="#" class="cart_name fl">我的购物车</a>
 			<div class="goods_count fl">1</div>
 		</div>
+        {% endblock %}
 	</div>
-
+    {% block header %}
 	<div class="navbar_con">
 		<div class="navbar clearfix">
 			<div class="subnav_con fl">
@@ -75,7 +80,7 @@
 			</ul>
 		</div>
 	</div>
-
+    {% endblock %}
 {#	<div class="breadcrumb">#}
 {#		<a href="#">全部分类</a>#}
 {#		<span>></span>#}
