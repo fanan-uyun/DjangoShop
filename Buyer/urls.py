@@ -9,6 +9,8 @@ urlpatterns = [
     path('goods_list/', goods_list), # 前台商品列表页
     path('pay_order/', pay_order), # v3.3 前台商品支付页面
     path('pay_result/', pay_result), # v3.3 前台商品支付结束响应页面
+    path('goods_detail/', goods_detail), # v3.4 前台商品详情页
+
 ]
 
 urlpatterns += [

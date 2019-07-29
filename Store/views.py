@@ -168,7 +168,7 @@ def exit(request):
     del request.session["username"]
     return response
 
-@loginValid
+# @loginValid
 def store_register(request):
     # v1.5 新增店铺注册
     # 查询所有的店铺类型
@@ -407,3 +407,7 @@ def delete_goods_type(request):
     goods_type = GoodsType.objects.get(id=id)
     goods_type.delete()
     return HttpResponseRedirect('/Store/list_goods_type/')
+
+
+def base(request):
+    return render(request,"store/base.html")

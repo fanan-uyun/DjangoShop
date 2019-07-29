@@ -108,6 +108,16 @@ def goods_list(request):
         goodsList = goods_type.goods_set.filter(goods_under=1)
     return render(request,"buyer/goods_list.html",locals())
 
+
+# v3.4 商品详情页功能视图，通过get参数获取
+def goods_detail(request):
+    goods_id = request.GET.get("goods_id")
+    if goods_id:
+        goods = Goods.objects.filter(id=int(goods_id)).first()
+        if goods:
+            return render(request, "buyer/detail.html",locals())
+    return HttpResponse("没有您指定的商品")
+
 # v3.3 将支付宝接口应用到前台付款,并用get请求发送支付金额和订单id
 def pay_order(request):
     # v3.3 获取订单金额

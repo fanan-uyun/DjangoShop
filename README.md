@@ -2484,3 +2484,132 @@ timestamp=2019-07-26+19%3A59%3A37
 支付成功响应效果：
 
 ![](https://github.com/py304/DjangoShop/blob/master/images/pay17.jpg)
+
+
+
+## 二十一、商品详情页功能完善
+
+**1、新建商品详情页html文件，继承base，并用块标签填充中间内容**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/detail1.jpg)
+
+**2、商品详情页视图函数**
+
+```python
+# v3.4 商品详情页功能视图，通过get参数获取
+def goods_detail(request):
+    goods_id = request.GET.get("goods_id")
+    if goods_id:
+        goods = Goods.objects.filter(id=int(goods_id)).first()
+        if goods:
+            return render(request, "buyer/detail.html",locals())
+    return HttpResponse("没有您指定的商品")
+```
+
+**3、前端数据渲染，并使用js处理商品数量，总价的问题**
+
+```html
+{% extends "buyer/base.html" %}
+
+{% block title %}
+    商品详情
+{% endblock %}
+
+{% block content %}
+    <div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="#">新鲜水果</a>
+		<span>></span>
+		<a href="#">商品详情</a>
+	</div>
+
+	<div class="goods_detail_con clearfix">
+		<div class="goods_detail_pic fl"><img style="height: 350px;width: 350px;" src="/static/{{ goods.goods_image }}"></div>
+
+		<div class="goods_detail_list fr">
+			<h3>{{ goods.goods_name }}</h3>
+			<p>{{ goods.goods_description }}</p>
+			<div class="prize_bar">
+				<span class="show_pirze">¥<em id="price">{{ goods.goods_price }}</em></span>
+				<span class="show_unit">单  位：500g</span>
+			</div>
+			<div class="goods_num clearfix">
+				<div class="num_name fl">数 量：</div>
+				<div class="num_add fl">
+					<input type="text" id="count" class="num_show fl" value="1">
+					<a href="javascript:;" onclick="changecount('add')" class="add fr">+</a>
+					<a href="javascript:;" onclick="changecount('minus')" class="minus fr">-</a>
+				</div>
+			</div>
+			<div class="total">总价：<em id="total">{{ goods.goods_price }}</em><em>元</em></div>
+			<div class="operate_btn">
+				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="javascript:;" class="add_cart" id="add_cart">加入购物车</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+					<li>
+						<a href="#"><img src="/static/buyer/images/goods/goods001.jpg"></a>
+						<h4><a href="#">进口柠檬</a></h4>
+						<div class="prize">￥3.90</div>
+					</li>
+					<li>
+						<a href="#"><img src="/static/buyer/images/goods/goods002.jpg"></a>
+						<h4><a href="#">玫瑰香葡萄</a></h4>
+						<div class="prize">￥16.80</div>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<ul class="detail_tab clearfix">
+				<li class="active">商品介绍</li>
+				<li>评论</li>
+			</ul>
+
+			<div class="tab_content">
+				<dl>
+					<dt>商品详情：</dt>
+					<dd>草莓采摘园位于北京大兴区 庞各庄镇四各庄村 ，每年1月-6月面向北京以及周围城市提供新鲜草莓采摘和精品礼盒装草莓，草莓品种多样丰富，个大香甜。所有草莓均严格按照有机标准培育，不使用任何化肥和农药。草莓在采摘期间免洗可以直接食用。欢迎喜欢草莓的市民前来采摘，也欢迎各大单位选购精品有机草莓礼盒，有机草莓礼盒是亲朋馈赠、福利送礼的最佳选择。 </dd>
+				</dl>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}
+
+{% block script %}
+    <script src="/static/buyer/js/jquery-1.12.4.min.js"></script>
+    <script>
+        function changecount(sign) {
+            var value = $("#count").val();
+            if(sign == "add"){
+                $("#count").val(++value);
+            }else {
+                if(value <= 1){
+                    $("#count").val(1);
+                }else{
+                   $("#count").val(--value);
+                }
+            }
+            var price = $("#price").text();
+            var total_price = value * price;
+            $("#total").text(total_price);
+        }
+    </script>
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/detail2.gif)
+
+
