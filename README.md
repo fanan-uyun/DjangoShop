@@ -2884,3 +2884,32 @@ def place_order(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/order4.jpg)
 
 
+## 二十三、优化商品与商铺的关系
+
+由于之前商品与商铺是多对多关系，所以进行商品购买时，店铺可能为多个店铺，必须指定一个店铺才能实现商品的购买。
+
+所以现在优化商品商铺关系为多对一
+
+**1、修改商品表字段**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_store1.jpg)
+
+**2、同步数据库**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_store2.jpg)
+
+**3、修改之前商品业务逻辑**
+
+首先是添加商品视图，将多对多关系数据保存删除掉，直接使用一对多关系添加商品的店铺id
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_store3.jpg)
+
+修改商品数据正常，不需要修改
+
+前台购买商品视图需要更新
+
+![](https://github.com/py304/DjangoShop/blob/master/images/goods_store4.jpg)
+
+然后从后台到前台重新测试一遍，无误
+
+

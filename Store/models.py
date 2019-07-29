@@ -49,7 +49,8 @@ class Goods(models.Model):
     goods_under = models.IntegerField(verbose_name="商品状态",default=1)
     # v2.6 新增商品类型对应商品类型表
     goods_type = models.ForeignKey(to=GoodsType,on_delete=models.CASCADE,verbose_name="商品类型")
-    store_id = models.ManyToManyField(to=Store,verbose_name="商品店铺")
+    # v3.6 修改商铺商品为一对多关系
+    store_id = models.ForeignKey(to=Store,on_delete=models.CASCADE,verbose_name="商品店铺")
 
 # 定义商品图片类
 class GoodsImg(models.Model):

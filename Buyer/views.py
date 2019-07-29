@@ -137,7 +137,9 @@ def place_order(request):
         user_id = request.COOKIES.get("user_id")
         # 数据库数据
         goods = Goods.objects.get(id=int(goods_id))
-        store_id = goods.store_id.get(id = 7).id
+        # store_id = goods.store_id.get(id = 7).id
+        # v3.6 更替商铺商品一对多关系字段保存商铺id
+        store_id = goods.store_id.id
         price = goods.goods_price
 
         # 创建一个订单

@@ -246,13 +246,15 @@ def add_goods(request):
         goods.goods_image = goods_image
         # v2.9 保存商品类型，注意一对多关系，一条数据
         goods.goods_type = GoodsType.objects.get(id=int(goods_type))
+        # v3.6 保存店铺商品一对多关系数据
+        goods.store_id = Store.objects.get(id=int(store_id))
         goods.save() # 保存一条记录
 
         # 保存多对多数据(注意get方式获取到的数据为字符串)
-        goods.store_id.add(
-            Store.objects.get(id=int(store_id))
-        )
-        goods.save()
+        # goods.store_id.add(
+        #     Store.objects.get(id=int(store_id))
+        # )
+        # goods.save()
         return HttpResponseRedirect('/Store/goods_list/up/')
 
     return render(request,"store/add_goods.html",locals())
