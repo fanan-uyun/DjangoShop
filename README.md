@@ -3031,3 +3031,148 @@ gif展示商品购买支付效果：
 ![](https://github.com/py304/DjangoShop/blob/master/images/order_pay1.jpg)
 
 
+## 二十五、购物车建模及ajax实现数据添加
+
+**1、购物车建模并同步数据库**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/cart1.jpg)
+
+**2、根据原生模板新建购物车列表页面**
+
+```html
+{% extends "buyer/base.html" %}
+
+{% block title %}
+    购物车
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block order %}
+    <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
+{% endblock %}
+
+{% block car %}{% endblock %}
+
+{% block search %}
+    <div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="total_count">全部商品<em>2</em>件</div>	
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+    {% for goods in goods_list %}
+	<ul class="cart_list_td clearfix">
+		<li class="col01"><input type="checkbox" name="" checked></li>
+		<li class="col02"><img src="/static/{{ goods.goods_picture }}"></li>
+		<li class="col03">{{ goods.goods_name }}<br><em>{{ goods.goods_price }}元/500g</em></li>
+		<li class="col04">500g</li>
+		<li class="col05">{{ goods.goods_price }}元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="{{ goods.goods_number }}">
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		<li class="col07">{{ goods.goods_total }}元</li>
+		<li class="col08"><a href="javascript:;">删除</a></li>
+	</ul>
+    {% endfor %}
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked=""></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
+		<li class="col04"><a href="place_order.html">去结算</a></li>
+	</ul>
+{% endblock %}
+```
+
+**3、购物车展示视图**
+
+```python
+# v3.8 购物车列表页展示
+def cart(request):
+    # 根据cookie获取user_id
+    user_id = request.COOKIES.get("user_id")
+    # 查询购物车中的商品
+    goods_list = Cart.objects.filter(user_id = user_id)
+    return render(request,"buyer/cart.html",locals())
+```
+
+**4、在商品详情页对添加购物车做ajax_post方式添加**
+
+```html
+$("#add_cart").click(
+    function () {
+        var count = $("#count").val();
+        var goods_id = $("#goods_id").val();
+        var send_data = {
+            "count" : count,
+            "goods_id" : goods_id,
+            "csrfmiddlewaretoken" : '{{ csrf_token }}'
+        };
+        var url = "/Buyer/add_cart/";
+        $.ajax(
+            {
+                url : url,
+                type : "post",
+                data : send_data,
+                success : function (data) {
+                    alert(data.data)
+                },
+                error : function (error) {
+                    console.log(error)
+                }
+            }
+        )
+    }
+)
+```
+
+**4、前台新增添加购物车视图函数**
+
+```python
+# v3.8 添加购物车
+def add_cart(request):
+    # 定义json数据状态
+    result = {"state":"error","data":""}
+    if request.method == "POST":
+        # 获取ajax_post请求数据
+        count = int(request.POST.get("count"))
+        goods_id = request.POST.get("goods_id")
+        # 数据库查询商品
+        goods = Goods.objects.get(id=int(goods_id))
+        # 根据cookie查询当前用户
+        user_id = request.COOKIES.get("user_id")
+
+        # 创建一个购物车，用于添加数据
+        cart = Cart()
+        cart.goods_name = goods.goods_name
+        cart.goods_price = goods.goods_price
+        cart.goods_total = goods.goods_price * count
+        cart.goods_number = count
+        cart.goods_picture = goods.goods_image
+        cart.goods_id = goods.id
+        cart.goods_store = goods.store_id.id
+        cart.user_id = user_id
+        cart.save()
+        result["state"] = "success"
+        result["data"] = "商品添加成功"
+    else:
+        result["data"] = "请求错误"
+    return JsonResponse(result)
+```
+
+
+

@@ -23,8 +23,12 @@
                 <td>{{ order.goods_name }}</td>
                 <td>{{ order.goods_total }}</td>
                 <td>
-                    <a class="btn btn-primary" href="#">确认发货</a>
+                    {% ifequal status 'undo' %}
+                    <a class="btn btn-primary" href="/Store/set_order/complete/?order_id={{ order.order_id.id }}">确认发货</a>
                     <a class="btn btn-danger" href="#">拒绝发货</a>
+                    {% else %}
+                    <a class="btn btn-warning" href="/Store/set_order/delete/?order_id={{ order.order_id.id }}">删除订单</a>
+                    {% endifequal %}
                 </td>
             </tr>
             {% endfor %}

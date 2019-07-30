@@ -2,6 +2,7 @@ import time
 
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import HttpResponseRedirect
 
 from Buyer.models import *
@@ -169,6 +170,43 @@ def place_order(request):
     else:
         return HttpResponse("非法请求")
 
+# v3.8 购物车列表页展示
+def cart(request):
+    # 根据cookie获取user_id
+    user_id = request.COOKIES.get("user_id")
+    # 查询购物车中的商品
+    goods_list = Cart.objects.filter(user_id = user_id)
+    return render(request,"buyer/cart.html",locals())
+
+# v3.8 添加购物车
+def add_cart(request):
+    # 定义json数据状态
+    result = {"state":"error","data":""}
+    if request.method == "POST":
+        # 获取ajax_post请求数据
+        count = int(request.POST.get("count"))
+        goods_id = request.POST.get("goods_id")
+        # 数据库查询商品
+        goods = Goods.objects.get(id=int(goods_id))
+        # 根据cookie查询当前用户
+        user_id = request.COOKIES.get("user_id")
+
+        # 创建一个购物车，用于添加数据
+        cart = Cart()
+        cart.goods_name = goods.goods_name
+        cart.goods_price = goods.goods_price
+        cart.goods_total = goods.goods_price * count
+        cart.goods_number = count
+        cart.goods_picture = goods.goods_image
+        cart.goods_id = goods.id
+        cart.goods_store = goods.store_id.id
+        cart.user_id = user_id
+        cart.save()
+        result["state"] = "success"
+        result["data"] = "商品添加成功"
+    else:
+        result["data"] = "请求错误"
+    return JsonResponse(result)
 
 
 # v3.3 将支付宝接口应用到前台付款,并用get请求发送支付金额和订单id

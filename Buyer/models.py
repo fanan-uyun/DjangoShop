@@ -39,3 +39,14 @@ class OrderDetail(models.Model):
     goods_total = models.FloatField(verbose_name="商品总价")
     goods_store = models.IntegerField(verbose_name="店铺id")
     goods_image = models.ImageField(verbose_name="商品图片")
+
+# v3.8 购物车
+class Cart(models.Model):
+    goods_name = models.CharField(max_length=32,verbose_name="商品名称")
+    goods_price = models.FloatField(verbose_name="商品价格")
+    goods_total = models.FloatField(verbose_name="单类商品总价")
+    goods_number = models.IntegerField(verbose_name="商品数量")
+    goods_picture = models.ImageField(upload_to="buyer/images",verbose_name="商品图片")
+    goods_id = models.IntegerField(verbose_name="商品id")
+    goods_store = models.IntegerField(verbose_name="商品店铺")
+    user_id = models.IntegerField(verbose_name="用户id")

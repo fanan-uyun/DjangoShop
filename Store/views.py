@@ -411,13 +411,17 @@ def delete_goods_type(request):
     return HttpResponseRedirect('/Store/list_goods_type/')
 
 # v3.7 新增订单管理
-def order_list(request):
+def order_list(request,status):
+    if status == 'undo':
+        order_staus = 2
+    elif status == 'complete':
+        order_staus = 3
     # 获取前端页码,默认页码1
     page_num = request.GET.get("page_num", 1)
     # 获取当前商铺id
     store_id = request.COOKIES.get("is_store")
     # 查询当前店铺待发货（2）的订单
-    order_list = OrderDetail.objects.filter(goods_store=store_id,order_id__order_status=2)
+    order_list = OrderDetail.objects.filter(goods_store=store_id,order_id__order_status=order_staus)
     # 创建分页器
     paginator = Paginator(order_list, 5)
     # 获取具体页的数据
@@ -425,6 +429,23 @@ def order_list(request):
     # 返回页码列表
     page_range = paginator.page_range
     return render(request,"store/order_list.html",locals())
+
+# v3.7 订单操作,后台待处理和已完成订单展示视图
+def shipments(request,status):
+    if status == 'undo':
+        order_staus = 2
+    elif status == 'complete':
+        order_staus = 3
+    order_id = request.GET.get("order_id")
+    referer = request.META.get("HTTP_REFERER")
+    if order_id:
+        order = Order.objects.filter(id=order_id).first()
+        if status == 'delete':
+            order.delete()
+        else:
+            order.order_status = order_staus
+            order.save()
+    return HttpResponseRedirect(referer)
 
 def base(request):
     return render(request,"store/base.html")

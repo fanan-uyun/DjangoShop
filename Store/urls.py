@@ -12,7 +12,7 @@ urlpatterns = [
     path('add_good/', add_goods),
     path('list_goods_type/', goods_type_list),
     path('delete_goods_type/', delete_goods_type),
-    path('order_list/', order_list), # v3.7 订单列表页
+
 
 ]
 
@@ -21,5 +21,7 @@ urlpatterns += [
     re_path(r'update_goods/(?P<goods_id>\d+)', update_goods),
     re_path(r'goods_list/(?P<state>\w+)/', list_goods),
     re_path(r'set_goods/(?P<state>\w+)/', set_goods),
+    re_path(r'order_list/(?P<status>\w+)', order_list), # v3.7 订单列表页
+    re_path(r'set_order/(?P<status>\w+)', shipments),
     path('base/',base)
 ]

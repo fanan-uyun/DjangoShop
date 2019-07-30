@@ -97,5 +97,31 @@
             var total_price = value * price;
             $("#total").text(total_price.toFixed(2));
         }
+        
+        $("#add_cart").click(
+            function () {
+                var count = $("#count").val();
+                var goods_id = $("#goods_id").val();
+                var send_data = {
+                    "count" : count,
+                    "goods_id" : goods_id,
+                    "csrfmiddlewaretoken" : '{{ csrf_token }}'
+                };
+                var url = "/Buyer/add_cart/";
+                $.ajax(
+                    {
+                        url : url,
+                        type : "post",
+                        data : send_data,
+                        success : function (data) {
+                            alert(data.data)
+                        },
+                        error : function (error) {
+                            console.log(error)
+                        }
+                    }
+                )
+            }
+        )
     </script>
 {% endblock %}
