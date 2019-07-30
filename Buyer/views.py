@@ -124,7 +124,7 @@ def goods_detail(request):
 # v3.5 订单号生成函数
 def setOrder(user_id,goods_id,store_id):
     strtime = time.strftime("%Y%m%d%H%M%S",time.localtime())
-    return strtime+user_id+goods_id+store_id
+    return strtime+str(user_id)+str(goods_id)+str(store_id)
 
 # v3.5 订单详情
 def place_order(request):
@@ -145,7 +145,7 @@ def place_order(request):
 
         # 创建一个订单
         order = Order()
-        order.order_id = setOrder(str(user_id),str(goods_id),str(store_id))
+        order.order_id = setOrder(user_id,goods_id,store_id)
         order.goods_count = count
         order.order_user = Buyer.objects.get(id=user_id)
         order.order_price = count * price
@@ -168,6 +168,11 @@ def place_order(request):
         detail = [order_detail]
         return render(request,"buyer/place_order.html",locals())
     else:
+        order_id = request.GET.get("order_id")
+        if order_id:
+            order = Order.objects.get(id=order_id)
+            detail = order.orderdetail_set.all()
+            return render(request, "buyer/place_order.html", locals())
         return HttpResponse("非法请求")
 
 # v3.8 购物车列表页展示
@@ -176,6 +181,48 @@ def cart(request):
     user_id = request.COOKIES.get("user_id")
     # 查询购物车中的商品
     goods_list = Cart.objects.filter(user_id = user_id)
+    # v4.0 购物车商品添加至订单列表
+    if request.method == "POST":
+        # 获取购物车页面请求的post数据
+        post_data = request.POST
+        # 此列表用于收集前端传过来的商品
+        cart_data = []
+        # 遍历post数据，将购物车列表商品信息取出来
+        for k,v in post_data.items():
+            # 前端input选择框定义了name和value为购物车对应id
+            if k.startswith("goods_"):
+                cart_data.append(Cart.objects.get(id=int(v)))
+        # 提交过来的购物车数据总数（不是商品数量）
+        goods_count = len(cart_data)
+        # 订单总价
+        goods_total = sum([int(i.goods_total) for i in cart_data])
+
+        # 保存订单
+        order = Order()
+        # 购物车中生成订单号时，订单中可能有多个商品或多个商铺；使用goods_count代替商品id，使用一个数字代替商铺id
+        order.order_id = setOrder(user_id,goods_count,"2")
+        order.goods_count = goods_count
+        order.order_user = Buyer.objects.get(id=user_id)
+        order.order_price = goods_total
+        order.order_status = 1
+        order.save()
+
+        # 保存订单详情,这里的cart是购物车里的数据实例，不是商品的实例
+        for cart in cart_data:
+            orderdetail = OrderDetail()
+            orderdetail.order_id = order
+            orderdetail.goods_id = cart.goods_id
+            orderdetail.goods_name = cart.goods_name
+            orderdetail.goods_price = cart.goods_price
+            orderdetail.goods_number = cart.goods_number
+            orderdetail.goods_total = cart.goods_total
+            orderdetail.goods_store = cart.goods_store
+            orderdetail.goods_image = cart.goods_picture
+            orderdetail.save()
+        # 当在购物车中点击“"去结算"时跳转到订单列表进行支付
+        url = "/Buyer/place_order/?order_id=%s"%order.id
+        return HttpResponseRedirect(url)
+
     return render(request,"buyer/cart.html",locals())
 
 # v3.8 添加购物车

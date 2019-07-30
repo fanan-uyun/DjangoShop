@@ -3240,3 +3240,75 @@ def add_cart(request):
 ![](https://github.com/py304/DjangoShop/blob/master/images/cart.gif)
 
 
+## 二十七、购物车至订单、支付功能完善
+
+**1、购物车结算应该是跳转到订单页面，是属于向后台提交数据的过程，应该使用post请求，所以将购物车页面添加form表单及submit**
+
+
+**2、购物车商品提交，保存订单**
+
+```python
+# v3.8 购物车列表页展示
+def cart(request):
+    # 根据cookie获取user_id
+    user_id = request.COOKIES.get("user_id")
+    # 查询购物车中的商品
+    goods_list = Cart.objects.filter(user_id = user_id)
+    # v4.0 购物车商品添加至订单列表
+    if request.method == "POST":
+        # 获取购物车页面请求的post数据
+        post_data = request.POST
+        # 此列表用于收集前端传过来的商品
+        cart_data = []
+        # 遍历post数据，将购物车列表商品信息取出来
+        for k,v in post_data.items():
+            # 前端input选择框定义了name和value为购物车对应id
+            if k.startswith("goods_"):
+                cart_data.append(Cart.objects.get(id=int(v)))
+        # 提交过来的购物车数据总数（不是商品数量）
+        goods_count = len(cart_data)
+        # 订单总价
+        goods_total = sum([int(i.goods_total) for i in cart_data])
+
+        # 保存订单
+        order = Order()
+        # 购物车中生成订单号时，订单中可能有多个商品或多个商铺；使用goods_count代替商品id，使用一个数字代替商铺id
+        order.order_id = setOrder(user_id,goods_count,"2")
+        order.goods_count = goods_count
+        order.order_user = Buyer.objects.get(id=user_id)
+        order.order_price = goods_total
+        order.order_status = 1
+
+        # 保存订单详情,这里的cart是购物车里的数据实例，不是商品的实例
+        for cart in cart_data:
+            orderdetail = OrderDetail()
+            orderdetail.order_id = order
+            orderdetail.goods_id = cart.goods_id
+            orderdetail.goods_name = cart.goods_name
+            orderdetail.goods_price = cart.goods_price
+            orderdetail.goods_number = cart.goods_price
+            orderdetail.goods_total = cart.goods_total
+            orderdetail.goods_store = cart.goods_store
+            orderdetail.goods_image = cart.goods_picture
+            orderdetail.save()
+        # 当在购物车中点击“"去结算"时跳转到订单列表进行支付
+        url = "/Buyer/place_order/?order_id=%s"%order.id
+        return HttpResponseRedirect(url)
+
+    return render(request,"buyer/cart.html",locals())
+```
+
+
+**3、修改订单提交的视图，允许通过订单id进行获取**
+
+```python
+else:
+    order_id = request.GET.get("order_id")
+    if order_id:
+        order = Order.objects.get(id=order_id)
+        detail = order.orderdetail_set.all()
+        return render(request, "buyer/place_order.html", locals())
+    return HttpResponse("非法请求")
+```
+
+![](https://github.com/py304/DjangoShop/blob/master/images/cart_order.jpg)

@@ -6,6 +6,9 @@
 
 {% block header %}{% endblock %}
 
+{% block style %}
+    <script src="/static/store/vendor/bootstrap/js/bootstrap.min.js"></script>
+{% endblock %}
 {% block order %}
     <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
 {% endblock %}
@@ -29,6 +32,8 @@
 		<li class="col05">小计</li>
 		<li class="col06">操作</li>
 	</ul>
+    <form method="post">
+    {% csrf_token %}
     {% for goods in goods_list %}
 	<ul class="cart_list_td clearfix">
 		<li class="col01"><input type="checkbox" class="goods_check" name="goods_{{ goods.id }}" value="{{ goods.id }}" checked></li>
@@ -51,10 +56,10 @@
 		<li class="col01"><input id="allBox" type="checkbox" name="" checked=""></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
-		<li class="col04"><a href="place_order.html">去结算</a></li>
+		<li class="col04"><input style="width: 80px;height: 50px;background-color: red;border: 0px;color:honeydew;font-size: 18px;border-radius: 5%" type="submit" value="去结算"></li>
 	</ul>
+    </form>
 {% endblock %}
-
 {% block script %}
     <script src="/static/buyer/js/jquery-1.12.4.min.js"></script>
     <script>
