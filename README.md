@@ -3176,3 +3176,67 @@ def add_cart(request):
 
 
 
+
+## 二十六、购物车页面全选，全不选前端功能实现
+
+```html
+    {% for goods in goods_list %}
+	<ul class="cart_list_td clearfix">
+		<li class="col01"><input type="checkbox" class="goods_check" name="goods_{{ goods.id }}" value="{{ goods.id }}" checked></li>
+		<li class="col02"><img src="/static/{{ goods.goods_picture }}"></li>
+		<li class="col03">{{ goods.goods_name }}<br><em>{{ goods.goods_price }}元/500g</em></li>
+		<li class="col04">500g</li>
+		<li class="col05">{{ goods.goods_price }}元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="{{ goods.goods_number }}">
+				<a href="javascript:;" class="minus fl">-</a>	
+			</div>
+		</li>
+		<li class="col07">{{ goods.goods_total }}元</li>
+		<li class="col08"><a href="javascript:;">删除</a></li>
+	</ul>
+    {% endfor %}
+	<ul class="settlements">
+		<li class="col01"><input id="allBox" type="checkbox" name="" checked=""></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em>42.60</em><br>共计<b>2</b>件商品</li>
+		<li class="col04"><a href="place_order.html">去结算</a></li>
+	</ul>
+{% endblock %}
+
+{% block script %}
+    <script src="/static/buyer/js/jquery-1.12.4.min.js"></script>
+    <script>
+        $("#allBox").click(
+            function () {
+                {#console.log(this.checked)#} //true;false
+                if(this.checked){
+                    $(".goods_check").prop("checked",true) //prop设置或返回元素的属性和值
+                }else {
+                    $(".goods_check").prop("checked",false)
+                }
+            }
+        );
+        // 当全选之后取消某一商品的勾选，全选的勾选也得去掉
+        $(".goods_check").each(
+            function () {
+                $(this).click(
+                    function () {
+                        if(!this.checked){
+                            $("#allBox").prop("checked",false)
+                        }
+                    }
+                )
+            }
+        )
+    </script>
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/cart.gif)
+
+
