@@ -13,6 +13,7 @@ urlpatterns = [
     path('place_order/', place_order), # v3.5 订单详情页
     path('cart/', cart), # v3.8 购物车列表
     path('add_cart/', add_cart), # v3.8 添加购物车
+    path('del_cart/', del_cart_goods), # v4.1 删除购物车
 
 ]
 

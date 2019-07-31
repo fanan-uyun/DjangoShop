@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'Store',
     'Buyer',
     'ckeditor',
-    'ckeditor_uploader'
+    'ckeditor_uploader',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR,'static')
 
 CKEDITOR_UPLOAD_PATH = 'static/upload'
 CKEDITOR_IMAGE_BACKEND = 'pillow'
+
+# v4.1 restful接口配置
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':5
+}

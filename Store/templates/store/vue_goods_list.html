@@ -1,0 +1,114 @@
+{% extends "store/base.html" %}
+
+{% block title %}
+    {{ store_name }}-商品列表页面
+{% endblock %}
+
+{% block label %}
+    <a class="btn btn-warning" href="/Store/add_good/">添加商品</a>
+{% endblock %}
+
+{% block content %}
+    {% verbatim %}
+    <div id="goods">
+        <table class="table-bordered table">
+            <thead>
+                <tr align="center">
+                    <th>商品名称</th>
+                    <th>商品价格</th>
+                    <th>商品数量</th>
+                    <th>出厂日期</th>
+                    <th>保质期</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+
+            <tbody >
+                <tr v-for="goods in goods_list" align="center">
+                    <td>
+                        <a href="/Store/goods/{{ goods.id }}">{{ goods.goods_name }}</a>
+                    </td>
+                    <td>
+                        <input type="text" v-bind:value="goods.goods_price" style="text-align: center">
+                    </td>
+                    <td>{{ goods.goods_number }}</td>
+                    <td>{{ goods.goods_date }}</td>
+                    <td>{{ goods.goods_safeDate }}</td>
+                    <td>
+                        <a class="btn btn-danger" href="/Store/set_goods/down/?id={{ goods.id }}">下架</a>
+                        <!--
+                        {% ifequal state 'up' %}
+                        <a class="btn btn-danger" href="/Store/set_goods/down/?id={{ goods.id }}">下架</a>
+                        {% else %}
+                        <a class="btn btn-danger" href="/Store/set_goods/up/?id={{ goods.id }}">上架</a>
+                        {% endifequal %}
+                        <a class="btn btn-primary" href="/Store/set_goods/delete/?id={{ goods.id }}">销毁</a>
+                        -->
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+        <div class="dataTables_paginate paging_simple_numbers">
+            <ul class="pagination">
+                <li class="paginate_button page-item " v-for="p in page_range">
+                    <a class="page-link" href="#" v-on:click="get_page_data(p)">{{ p }}</a>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+    {% endverbatim %}
+{% endblock %}
+
+{% block script %}
+    <script src="/static/store/js/vue.min.js"></script>
+    <script src="/static/store/js/vue-resource.js"></script>
+    <script>
+        Vue.use(VueResource);//声明是vueresource对象
+        var vue = new Vue(
+            {
+                el:"#goods", //指定绑定的范围对象
+                data:{
+                    goods_list:[],
+                    page_range:[]
+                }, //具体绑定的数据对象
+                created:function () { //发起ajax get请求
+                    this.$http.get("/APIgoods/").then(
+                        function (data) {
+                            this.goods_list = data.data.results;//将接收的数据绑定到vue对象上
+                            page_number = Math.ceil(data.data.count/5);//计算总页码向上取值，这里的5尽量与setting设置里的页码数据量一直例6.6取7
+                            {#var page_range = [...new Array(page_number).keys()];//js生成页码列表#}
+                            var page_range = Array.from({length:page_number},(item, index)=> index+1);
+                            this.page_range = page_range;//将接收的数据绑定到vue对象上
+                            {#console.log(page_range);#}
+                            console.log(data.data);
+                            console.log(page_range);
+                            {#console.log(Array.from({length:10},(item, index)=> index+1))#}
+                        },
+                        function (error) {
+                            console.log(error)
+                        }
+                    )
+                },//初始化方法
+                methods:{
+                    get_page_data:function (page) {
+                        this.$http.get("/APIgoods/?page="+page).then(
+                        function (data) {
+                            this.goods_list = data.data.results;//将接收的数据绑定到vue对象上
+                            page_number = Math.ceil(data.data.count/5);//计算总页码向上取值，例6.6取7
+                            var page_range = Array.from({length:page_number},(item, index)=> index+1);//js生成页码列表
+                            this.page_range = page_range;//将接收的数据绑定到vue对象上
+                            console.log(page_range);
+                            console.log(data.data)
+                        },
+                        function (error) {
+                            console.log(error)
+                        }
+                    )
+                    }
+                },//可以被v-on绑定的方法
+            }
+        );
+    </script>
+{% endblock %}

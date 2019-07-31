@@ -52,6 +52,9 @@ class Goods(models.Model):
     # v3.6 修改商铺商品为一对多关系
     store_id = models.ForeignKey(to=Store,on_delete=models.CASCADE,verbose_name="商品店铺")
 
+    def __str__(self):
+        return self.goods_name
+
 # 定义商品图片类
 class GoodsImg(models.Model):
     img_address = models.ImageField(upload_to="store/images",verbose_name="图片地址")

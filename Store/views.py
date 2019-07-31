@@ -447,5 +447,26 @@ def shipments(request,status):
             order.save()
     return HttpResponseRedirect(referer)
 
+from rest_framework import viewsets
+
+from Store.serializers import *
+
+# v4.2 查询指定接口返回数据
+class GoodsViewSet(viewsets.ModelViewSet):
+    # 具体返回的数据
+    queryset = Goods.objects.all()
+    # 指定过滤的类
+    serializer_class = GoodsSerializer
+
+class GoodsTypeViewSet(viewsets.ModelViewSet):
+    # 具体返回的数据
+    queryset = GoodsType.objects.all()
+    # 指定过滤的类
+    serializer_class = GoodsTypeSerializer
+
+# 使用接口进行前端数据渲染测试
+def vue_goods_list(request):
+    return render(request,"store/vue_goods_list.html")
+
 def base(request):
     return render(request,"store/base.html")

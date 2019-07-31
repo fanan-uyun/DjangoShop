@@ -3312,3 +3312,241 @@ else:
 ```
 
 ![](https://github.com/py304/DjangoShop/blob/master/images/cart_order.jpg)
+
+
+## 二十八、搭建django rest接口
+
+**1、安装rest接口框架**
+
+```python
+pip install djangorestframework
+pip install django-filter
+pip install Markdown  
+```
+
+**2、配置setting**
+
+安装app
+
+```python
+'rest_framework'
+```
+
+接口配置
+
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+```
+
+**3、创建serializers文件，用来存放接口过滤器**
+
+
+![](https://github.com/py304/DjangoShop/blob/master/images/ser1.jpg)
+
+**4、在视图当中查询接口要返回的数据，并指定过滤器**
+
+```python
+from rest_framework import viewsets
+
+from Store.serializers import *
+
+# v4.2 查询指定接口返回数据
+class GoodsViewSet(viewsets.ModelViewSet):
+    # 具体返回的数据
+    queryset = Goods.objects.all()
+    # 指定过滤的类
+    serializer_class = GoodsSerializer
+
+class GoodsTypeViewSet(viewsets.ModelViewSet):
+    # 具体返回的数据
+    queryset = GoodsType.objects.all()
+    # 指定过滤的类
+    serializer_class = GoodsTypeSerializer
+```
+
+**5、在路由当中注册接口**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/rest.jpg)
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/api1.jpg)
+
+![](https://github.com/py304/DjangoShop/blob/master/images/api2.jpg)
+
+
+## 二十九、使用搭建的django rest接口配合前端vue-resource渲染数据
+
+就拿后台的商品列表为例，复制一份good_list.html验证,使用vue-resource绑定接口中的数据
+
+```html
+{% extends "store/base.html" %}
+
+{% block title %}
+    {{ store_name }}-商品列表页面
+{% endblock %}
+
+{% block label %}
+    <a class="btn btn-warning" href="/Store/add_good/">添加商品</a>
+{% endblock %}
+
+{% block content %}
+    <table class="table-bordered table">
+        <thead>
+            <tr align="center">
+                <th>商品名称</th>
+                <th>商品价格</th>
+                <th>商品数量</th>
+                <th>出厂日期</th>
+                <th>保质期</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        {% verbatim %}
+        <tbody id="goods">
+            <tr v-for="goods in goods_list" align="center">
+                <td>
+                    <a href="/Store/goods/{{ goods.id }}">{{ goods.goods_name }}</a>
+                </td>
+                <td>
+                    <input type="text" v-bind:value="goods.goods_price" style="text-align: center">
+                </td>
+                <td>{{ goods.goods_number }}</td>
+                <td>{{ goods.goods_date }}</td>
+                <td>{{ goods.goods_safeDate }}</td>
+                <td>
+                    <a class="btn btn-danger" href="/Store/set_goods/down/?id={{ goods.id }}">下架</a>
+                    <!--
+                    {% ifequal state 'up' %}
+                    <a class="btn btn-danger" href="/Store/set_goods/down/?id={{ goods.id }}">下架</a>
+                    {% else %}
+                    <a class="btn btn-danger" href="/Store/set_goods/up/?id={{ goods.id }}">上架</a>
+                    {% endifequal %}
+                    <a class="btn btn-primary" href="/Store/set_goods/delete/?id={{ goods.id }}">销毁</a>
+                    -->
+                </td>
+            </tr>
+        </tbody>
+        {% endverbatim %}
+    </table>
+    <div class="dataTables_paginate paging_simple_numbers">
+        <ul class="pagination">
+            {% for p in page_range %}
+            <li class="paginate_button page-item ">
+                <a class="page-link" href="?keywords={{ keywords }}&page_num={{ p }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="/static/store/js/vue.min.js"></script>
+    <script src="/static/store/js/vue-resource.js"></script>
+    <script>
+        Vue.use(VueResource);
+        var vue = new Vue(
+            {
+                el:"#goods",
+                data:{
+                    goods_list:[]
+                },
+                created:function () {
+                    this.$http.get("/APIgoods/").then(
+                        function (data) {
+                            this.goods_list = data.data;
+                            console.log(data.data)
+                        },
+                        function (error) {
+                            console.log(error)
+                        }
+                    )
+                },
+                methods:{
+
+                }
+            }
+        );
+    </script>
+{% endblock %}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/vue.jpg)
+
+
+## 三十、使用搭建的django rest接口分页功能对前端进行数据分页
+
+在django restframework框架及数据接口搭建配置好的基础上，在setting中配置分页参数：
+
+可以通过设置DEFAULT_PAGINATION_CLASS和PAGE_SIZE，设置全局变量
+
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+```
+
+![](https://github.com/py304/DjangoShop/blob/master/images/page1.jpg)
+
+使用vue进行前端分页数据绑定及分页列表点击事件
+
+```html
+<script src="/static/store/js/vue.min.js"></script>
+<script src="/static/store/js/vue-resource.js"></script>
+<script>
+    Vue.use(VueResource);//声明是vueresource对象
+    var vue = new Vue(
+        {
+            el:"#goods", //指定绑定的范围对象
+            data:{
+                goods_list:[],
+                page_range:[]
+            }, //具体绑定的数据对象
+            created:function () { //发起ajax get请求
+                this.$http.get("/APIgoods/").then(
+                    function (data) {
+                        this.goods_list = data.data.results;//将接收的数据绑定到vue对象上
+                        page_number = Math.ceil(data.data.count/5);//计算总页码向上取值，这里的5尽量与setting设置里的页码数据量一直例6.6取7
+                        {#var page_range = [...new Array(page_number).keys()];//js生成页码列表#}
+                        var page_range = Array.from({length:page_number},(item, index)=> index+1);
+                        this.page_range = page_range;//将接收的数据绑定到vue对象上
+                        {#console.log(page_range);#}
+                        console.log(data.data);
+                        console.log(page_range);
+                        {#console.log(Array.from({length:10},(item, index)=> index+1))#}
+                    },
+                    function (error) {
+                        console.log(error)
+                    }
+                )
+            },//初始化方法
+            methods:{
+                get_page_data:function (page) {
+                    this.$http.get("/APIgoods/?page="+page).then(
+                    function (data) {
+                        this.goods_list = data.data.results;//将接收的数据绑定到vue对象上
+                        page_number = Math.ceil(data.data.count/5);//计算总页码向上取值，例6.6取7
+                        var page_range = Array.from({length:page_number},(item, index)=> index+1);//js生成页码列表
+                        this.page_range = page_range;//将接收的数据绑定到vue对象上
+                        console.log(page_range);
+                        console.log(data.data)
+                    },
+                    function (error) {
+                        console.log(error)
+                    }
+                )
+                }
+            },//可以被v-on绑定的方法
+        }
+    );
+</script>
+```
+
+![](https://github.com/py304/DjangoShop/blob/master/images/page2.jpg)

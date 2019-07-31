@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import HttpResponseRedirect
+from django.db.models import Sum
 
 from Buyer.models import *
 from Store.models import *
@@ -187,15 +188,23 @@ def cart(request):
         post_data = request.POST
         # 此列表用于收集前端传过来的商品
         cart_data = []
+        cart_list_id = []
         # 遍历post数据，将购物车列表商品信息取出来
         for k,v in post_data.items():
             # 前端input选择框定义了name和value为购物车对应id
             if k.startswith("goods_"):
                 cart_data.append(Cart.objects.get(id=int(v)))
+                # v4.1 将购物车id存储到cart_list_id中
+                cart_list_id.append(int(v))
+
         # 提交过来的购物车数据总数（不是商品数量）
         goods_count = len(cart_data)
         # 订单总价
-        goods_total = sum([int(i.goods_total) for i in cart_data])
+        # goods_total = sum([int(i.goods_total) for i in cart_data])
+        # v4.1 使用聚类查询计算总价
+        cart_goods = Cart.objects.filter(id__in=cart_list_id).aggregate(Sum("goods_total"))
+        # {'goods_total__sum': 258.0}
+        goods_total = cart_goods.get("goods_total__sum")
 
         # 保存订单
         order = Order()
@@ -255,6 +264,13 @@ def add_cart(request):
         result["data"] = "请求错误"
     return JsonResponse(result)
 
+# v4.1 删除购物车中的商品
+def del_cart_goods(request):
+    cart_id = request.GET.get("cart_id")
+    cart = Cart.objects.get(id=cart_id)
+    referer = request.META.get("HTTP_REFERER")
+    cart.delete()
+    return HttpResponseRedirect(referer)
 
 # v3.3 将支付宝接口应用到前台付款,并用get请求发送支付金额和订单id
 def pay_order(request):

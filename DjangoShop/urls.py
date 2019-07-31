@@ -16,6 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include,re_path
 from Buyer.views import index
+from Store.views import GoodsViewSet
+from Store.views import GoodsTypeViewSet
+
+from rest_framework import routers
+
+
+
+# 声明一个默认的路由注册器
+router = routers.DefaultRouter()
+# 注册定义好的接口视图
+router.register(r'goods',GoodsViewSet)
+router.register(r'goodsType',GoodsTypeViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,5 +39,7 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    re_path(r'^$',index)
+    re_path(r'^$',index),
+    re_path(r'^API',include(router.urls)), # restful的根路由
+    re_path(r'^api-auth',include('rest_framework.urls')), # 接口认证路由
 ]
