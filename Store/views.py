@@ -1,7 +1,7 @@
 import hashlib
 
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator  # v1.9 导入分页模块
 
@@ -450,13 +450,17 @@ def shipments(request,status):
 from rest_framework import viewsets
 
 from Store.serializers import *
-
+# 导入过滤器
+from django_filters.rest_framework import DjangoFilterBackend
 # v4.2 查询指定接口返回数据
 class GoodsViewSet(viewsets.ModelViewSet):
     # 具体返回的数据
     queryset = Goods.objects.all()
     # 指定过滤的类
     serializer_class = GoodsSerializer
+    # v4.3 新增接口过滤
+    filter_backends = [DjangoFilterBackend]  # 采用哪个过滤器
+    filterset_fields = ['goods_name','goods_price']  # 进行查询的字段
 
 class GoodsTypeViewSet(viewsets.ModelViewSet):
     # 具体返回的数据
@@ -467,6 +471,28 @@ class GoodsTypeViewSet(viewsets.ModelViewSet):
 # 使用接口进行前端数据渲染测试
 def vue_goods_list(request):
     return render(request,"store/vue_goods_list.html")
+
+from django.core.mail import send_mail
+from django.conf import settings
+def sendMail(request):
+    msg = '服务器运行良好'
+    send_mail(
+        subject='Django邮件测试',
+        message=msg,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=["13739257442@163.com"],  # 这里注意替换成自己的目的邮箱，不然就发到我的邮箱来了：）
+        fail_silently=False
+    )
+    return HttpResponse('测试邮件已发出请注意查收')
+
+
+# 触发celery任务的视图
+from CeleryTask.tasks import add
+from django.http import JsonResponse
+
+def get_add(request):
+    add.delay(5,7)
+    return JsonResponse({"state":200})
 
 def base(request):
     return render(request,"store/base.html")

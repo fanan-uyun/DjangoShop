@@ -13,6 +13,8 @@ urlpatterns = [
     path('list_goods_type/', goods_type_list),
     path('delete_goods_type/', delete_goods_type),
     path('vgl/', vue_goods_list),
+    path('get_add/', get_add),
+    path('send_mail/', sendMail),
 
 
 ]

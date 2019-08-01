@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'Buyer',
     'ckeditor',
     'ckeditor_uploader',
-    'rest_framework'
+    'rest_framework',
+    'djcelery'
 ]
 
 MIDDLEWARE = [
@@ -137,12 +138,59 @@ CKEDITOR_IMAGE_BACKEND = 'pillow'
 
 # v4.1 restful接口配置
 REST_FRAMEWORK = {
+    # 权限
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ],
+
+    # 自定义返回内容
+    'DEFAULT_RENDERER_CLASSES': (
+        'utils.rendererresponse.Customrenderer',
+    ),
+
+    # 过滤器
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',# django-filters自带的查询过滤器
+    ),
+
+    # 分页
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE':5,
-    'DEFAULT_RENDERER_CLASSES':(
-        'utils.rendererresponse.Customrenderer',
-    )
+
+}
+
+
+# 配置邮件服务器
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 发送邮件采用smtp服务
+
+EMAIL_USE_TLS = False  #使用tls方式
+
+EMAIL_HOST = 'smtp.qq.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = '996623077@qq.com'
+EMAIL_HOST_PASSWORD = 'euaqgfrwmsuvbcfi'
+DEFAULT_FROM_EMAIL = '996623077@qq.com'
+
+
+# celery配置
+import djcelery  # 导入django-celery模块
+djcelery.setup_loader()  # 加载模块
+BROKER_URL = 'redis://127.0.0.1:6379/1'  # 任务容器地址，Redis数据库地址
+CELERY_IMPORTS = ('CeleryTask.tasks')  # 具体的任务文件
+CELERY_TIMEZONE = 'Asia/Shanghai'  # celery时区
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'  # celery处理器
+
+
+# celery 的定时器
+from celery.schedules import crontab
+from celery.schedules import timedelta
+
+CELERYBEAT_SCHEDULE = {  # 定时器策略
+    # 定时任务一：每隔30s运行一次
+    u'测试定时器1': {
+        'task': 'CeleryTask.tasks.taskExample',
+        # 'schedule': crontab(minute='*/2'),
+        'schedule': timedelta(seconds=30),
+        'args': (),
+    },
 }

@@ -3550,3 +3550,68 @@ REST_FRAMEWORK = {
 ```
 
 ![](https://github.com/py304/DjangoShop/blob/master/images/page2.jpg)
+
+
+
+## 三十一、重写restframework框架renderer方法，自定义接口返回数据
+
+**1、在项目的根目录创建utils包用来存放要编写的renderer文件**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/render1.jpg)
+
+**2、在这个包下面创建一个py文件**
+
+![](https://github.com/py304/DjangoShop/blob/master/images/render2.jpg)
+
+**3、编写renderer类**
+
+```python
+from rest_framework.renderers import JSONRenderer
+
+class Customrenderer(JSONRenderer):
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        """
+        :param data: 返回的数据
+        :param accepted_media_type: 接收的类型
+        :param renderer_context:  渲染呈现的内容
+        """
+        # 如果有请求数据过来：类似之前的if request.method == "POST"
+        if renderer_context:
+            # 判断返回的数据是否为字典
+            if isinstance(data,dict):
+                msg = data.pop("msg","请求成功") # 如果是字典，获取字典当中的msg键的值;若没有这个键，则给出一个回应
+                code = data.pop("code",0) # 如果是字典，获取字典当中的code键的值;若没有这个键，则给出一个回应
+            else:   # 非字典类型
+                msg = "请求成功"
+                code = 0
+            # 重新构建返回数据的格式
+            ret = {
+                "msg":msg,
+                "code":code,
+                "author":"zhang",
+                "data":data
+            }
+            # 根据父类方式返回数据格式
+            return super().render(ret,accepted_media_type,renderer_context)
+        else: # 如果没有发生修改则返回原格式数据
+            return super().render(data,accepted_media_type,renderer_context)
+```
+
+**4、setting中安装renderer**
+
+```python
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':5,
+    'DEFAULT_RENDERER_CLASSES':(
+        'utils.rendererresponse.Customrenderer',
+    )
+}
+```
+
+效果：
+
+![](https://github.com/py304/DjangoShop/blob/master/images/render3.jpg)
