@@ -494,11 +494,21 @@ def get_add(request):
     add.delay(5,7)
     return JsonResponse({"state":200})
 
-
 def test_middleware(request):
-    print("自定义中间件测试")
-    return JsonResponse({"name":"测试"})
+    # def hello():
+    #     return HttpResponse("helloworld")
+    res = HttpResponse("I am res")
+    res.render = lambda :HttpResponse("helloworld")
+    return res
 
+# def test_middleware(request):
+#     print("自定义中间件测试")
+#     return JsonResponse({"name":"测试"})
+
+# def test_middleware(request):
+#     print("自定义中间件测试")
+#     raise TypeError("类型错误了，哈哈哈")
+#     return JsonResponse({"name":"测试"})
 
 def base(request):
     return render(request,"store/base.html")
