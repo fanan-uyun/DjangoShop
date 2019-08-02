@@ -15,6 +15,7 @@ urlpatterns = [
     path('vgl/', vue_goods_list),
     path('get_add/', get_add),
     path('send_mail/', sendMail),
+    path('tm/', test_middleware),
 
 
 ]

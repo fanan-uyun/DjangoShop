@@ -480,8 +480,8 @@ def sendMail(request):
         subject='Django邮件测试',
         message=msg,
         from_email=settings.EMAIL_HOST_USER,
-        recipient_list=["13739257442@163.com"],  # 这里注意替换成自己的目的邮箱，不然就发到我的邮箱来了：）
-        fail_silently=False
+        recipient_list=["13***2@163.com"],  # 这里注意替换成自己的目的邮箱，不然就发到我的邮箱来了：）
+        fail_silently=False  # 为True忽略邮件发送时报错的异常
     )
     return HttpResponse('测试邮件已发出请注意查收')
 
@@ -493,6 +493,12 @@ from django.http import JsonResponse
 def get_add(request):
     add.delay(5,7)
     return JsonResponse({"state":200})
+
+
+def test_middleware(request):
+    print("自定义中间件测试")
+    return JsonResponse({"name":"测试"})
+
 
 def base(request):
     return render(request,"store/base.html")

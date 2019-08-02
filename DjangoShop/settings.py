@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'DjangoShop.middleware.MiddlewareTest'
 ]
 
 ROOT_URLCONF = 'DjangoShop.urls'
@@ -163,10 +164,10 @@ REST_FRAMEWORK = {
 # 配置邮件服务器
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 发送邮件采用smtp服务
 
-EMAIL_USE_TLS = False  #使用tls方式
+EMAIL_USE_TLS = False  #是否使用tls加密方式
 
 EMAIL_HOST = 'smtp.qq.com'
-EMAIL_PORT = 465
+EMAIL_PORT = 25
 EMAIL_HOST_USER = '996623077@qq.com'
 EMAIL_HOST_PASSWORD = 'euaqgfrwmsuvbcfi'
 DEFAULT_FROM_EMAIL = '996623077@qq.com'
@@ -191,6 +192,12 @@ CELERYBEAT_SCHEDULE = {  # 定时器策略
         'task': 'CeleryTask.tasks.taskExample',
         # 'schedule': crontab(minute='*/2'),
         'schedule': timedelta(seconds=30),
+        'args': (),
+    },
+    u'熊大的叫床服务': {
+        'task': 'CeleryTask.tasks.DingTalk',
+        # 'schedule': crontab(minute='*/2'),
+        'schedule': timedelta(seconds=3),
         'args': (),
     },
 }

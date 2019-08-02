@@ -345,5 +345,9 @@ def pay_result(request):
     return render(request,"buyer/pay_result.html",locals())
     # return HttpResponse("支付成功")
 
+
+
+
+
 def base(request):
     return render(request,"buyer/base.html")
