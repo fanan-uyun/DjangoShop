@@ -387,7 +387,6 @@ def set_goods(request,state):
 def goods_type_list(request):
     # v2.8 查询现有的商品类型，渲染到前端
     goods_type_lst = GoodsType.objects.all()
-
     # 判断请求方式，并获取从模态框传过来的商品类型数据
     if request.method == "POST":
         name = request.POST.get("name")
@@ -452,6 +451,7 @@ from rest_framework import viewsets
 from Store.serializers import *
 # 导入过滤器
 from django_filters.rest_framework import DjangoFilterBackend
+from DjangoShop.filters import GoodsFilter # 导入自定义过滤器
 # v4.2 查询指定接口返回数据
 class GoodsViewSet(viewsets.ModelViewSet):
     # 具体返回的数据
@@ -460,7 +460,8 @@ class GoodsViewSet(viewsets.ModelViewSet):
     serializer_class = GoodsSerializer
     # v4.3 新增接口过滤
     filter_backends = [DjangoFilterBackend]  # 采用哪个过滤器
-    filterset_fields = ['goods_name','goods_price']  # 进行查询的字段
+    # filterset_fields = ['goods_name','goods_price']  # 进行查询的字段
+    filter_class = GoodsFilter
 
 class GoodsTypeViewSet(viewsets.ModelViewSet):
     # 具体返回的数据
@@ -498,7 +499,7 @@ def test_middleware(request):
     # def hello():
     #     return HttpResponse("helloworld")
     res = HttpResponse("I am res")
-    res.render = lambda :HttpResponse("helloworld")
+    # res.render = lambda :HttpResponse("helloworld")
     return res
 
 # def test_middleware(request):
@@ -509,6 +510,18 @@ def test_middleware(request):
 #     print("自定义中间件测试")
 #     raise TypeError("类型错误了，哈哈哈")
 #     return JsonResponse({"name":"测试"})
+
+from django.core.cache import cache
+def test(request):
+    store_data = cache.get("store_data")
+    if store_data:
+        store_data = store_data
+    else:
+        data = Store.objects.all()
+        cache.set("store_data",data,30)
+        # cache.add("store_data", data, 30) #add只会添加一个缓存，不会修改已经存在的缓存
+        store_data = data
+    return render(request,"store/TestCache.html",locals())
 
 def base(request):
     return render(request,"store/base.html")

@@ -17,7 +17,8 @@
 				</div>
                 {% if request.COOKIES.username %}
                 <div class="login_btn fl">
-                    <a href="">{{ request.COOKIES.username }}</a>
+                    <em>欢迎您：</em>
+                    <a href="" style="color: red">{{ request.COOKIES.username }}</a>
 					<span>|</span>
 					<a href="/Buyer/logout/">退出</a>
 				</div>

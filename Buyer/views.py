@@ -66,6 +66,10 @@ def loginValid(fun):
 
 # v2.6 前台用户首页
 # @loginValid
+
+from django.views.decorators.cache import cache_page
+
+@cache_page(60*15)  # 对当前视图进行缓存,缓存的寿命是15分钟
 def index(request):
     # v3.0 定义一个容器用来存放结果
     result_list = []

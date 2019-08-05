@@ -30,11 +30,40 @@ class Store(models.Model):
     user_id = models.IntegerField(verbose_name="店铺主人")
     type = models.ManyToManyField(to=StoreType,verbose_name="店铺类型")
 
+from django.db.models import Manager
+import datetime
+class GoodsTypeManage(Manager):
+    def addType(self,name,picture = "buyer/images/banner05.jpg"):
+        goods_type = GoodsType()
+        goods_type.name = name
+        now = datetime.datetime.now().strftime("%Y-%m-%d")
+        goods_type.description = "%s_%s"%(now,name)
+        goods_type.picture = picture
+        goods_type.save()
+        return goods_type
+
 # v2.6 新增商品类型
 class GoodsType(models.Model):
     name = models.CharField(max_length=32,verbose_name="商品类型名称")
     description = models.TextField(verbose_name="商品类型描述")
     picture = models.ImageField(upload_to="buyer/images",verbose_name="商品类型首页展示图片")
+    objects = GoodsTypeManage()
+
+class GoodsManage(Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(goods_price=24)
+    # def all(self):
+    #     """
+    #     查询所有香蕉
+    #     """
+    #     return super().all().filter(goods_name='香蕉')
+
+    def up_goods(self):
+        """
+        全部上架的商品
+        :return:
+        """
+        return Goods.objects.filter(goods_under=1)
 
 # 定义商品类
 class Goods(models.Model):
@@ -52,6 +81,7 @@ class Goods(models.Model):
     # v3.6 修改商铺商品为一对多关系
     store_id = models.ForeignKey(to=Store,on_delete=models.CASCADE,verbose_name="商品店铺")
 
+
     def __str__(self):
         return self.goods_name
 
@@ -60,6 +90,3 @@ class GoodsImg(models.Model):
     img_address = models.ImageField(upload_to="store/images",verbose_name="图片地址")
     img_description = models.TextField(verbose_name="图片描述")
     goods_id = models.ForeignKey(to=Goods,on_delete=models.CASCADE,verbose_name="商品id")
-
-
-

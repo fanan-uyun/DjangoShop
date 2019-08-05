@@ -1,0 +1,13 @@
+{% load cache %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% cache 500 yecache %}
+    <img src="http://pic16.nipic.com/20111006/6239936_092702973000_2.jpg" alt="加载失败">
+    {% endcache %}
+</body>
+</html>

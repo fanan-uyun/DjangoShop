@@ -42,10 +42,12 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'rest_framework',
+    'django_filters',
     'djcelery'
 ]
 
 MIDDLEWARE = [
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,8 +55,14 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'DjangoShop.middleware.MiddlewareTest'
+    # 'DjangoShop.middleware.MiddlewareTest',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
+
+# 全栈缓存配置，全局缓存
+# CACHE_MIDDLEWARE_KEY_PREFIX = ''
+# CACHE_MIDDLEWARE_SECONDS = 600
+
 
 ROOT_URLCONF = 'DjangoShop.urls'
 
@@ -112,13 +120,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False # 为True 默认使用UTC 0时区
 
 
 # Static files (CSS, JavaScript, Images)
@@ -200,4 +208,42 @@ CELERYBEAT_SCHEDULE = {  # 定时器策略
         'schedule': timedelta(seconds=3),
         'args': (),
     },
+}
+
+# The cache backends to use.
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',# 默认使用本地缓存
+#     }
+# }
+
+# 缓存配置
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',  # 声明使用memcache缓存
+#         'LOCATION': [
+#             '127.0.0.1:11211'
+#         ]  # 配置cache地址
+#     }
+# }
+
+# Redis数据库缓存配置
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',  # 声明使用redis数据库缓存
+#         'LOCATION': [
+#             'redis://127.0.0.1:6379/1'
+#         ],  # 配置cache地址
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient'
+#         }
+#     }
+# }
+
+# 使用默认数据库缓存
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',  # 使用Django默认数据库缓存
+        'LOCATION': 'cache_table' # 存放缓存的表
+    }
 }

@@ -25,18 +25,18 @@ class MiddlewareTest(MiddlewareMixin):
     #     # print(view_func.__name__)
     #     print(view_func(request))
 
-    # def process_exception(self,request,exception):
-    #     """
-    #     使用process_exception 记录错误
-    #     """
-    #     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    #     level = "error"
-    #     content = str(exception)
-    #     log_result = "%s [%s] %s \n"%(now,level,content)
-    #     file_path = os.path.join(BASE_DIR,"error.log")
-    #     with open(file_path,"a") as f:
-    #         f.write(log_result)
-    #     print(exception)
+    def process_exception(self,request,exception):
+        """
+        使用process_exception 记录错误
+        """
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        level = "error"
+        content = str(exception)
+        log_result = "%s [%s] %s \n"%(now,level,content)
+        file_path = os.path.join(BASE_DIR,"error.log")
+        with open(file_path,"a") as f:
+            f.write(log_result)
+        print(exception)
 
     def process_template_response(self,request,response):
         print("I am process_template")

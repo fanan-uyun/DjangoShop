@@ -1,1 +1,13 @@
 2019-08-02 17:00:07 [error] ÀàÐÍ´íÎóÁË£¬¹þ¹þ¹þ 
+2019-08-03 22:09:22 [error] __init__() got an unexpected keyword argument 'name' 
+2019-08-03 22:09:33 [error] __init__() got an unexpected keyword argument 'name' 
+2019-08-04 16:31:32 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:31:36 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:31:37 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:31:38 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:31:38 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:31:38 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:31:38 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-04 16:32:03 [error] __init__() got an unexpected keyword argument 'lable' 
+2019-08-05 11:26:58 [error] 'HttpResponse' object has no attribute 'add_post_render_callback' 
+2019-08-05 11:26:58 [error] 'HttpResponse' object has no attribute 'add_post_render_callback' 
