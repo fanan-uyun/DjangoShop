@@ -9,6 +9,10 @@ class Buyer(models.Model):
     phone = models.CharField(max_length=32,verbose_name="联系电话",null=True,blank=True)
     connect_address = models.TextField(verbose_name="联系地址",null=True,blank=True)
 
+    class Meta:
+        verbose_name = "买家"
+        verbose_name_plural = "买家"
+
 
 # 地址
 class Address(models.Model):
@@ -18,6 +22,9 @@ class Address(models.Model):
     post_number = models.CharField(max_length=32,verbose_name="邮编")
     buyer_id = models.ForeignKey(to=Buyer,on_delete=models.CASCADE,verbose_name="用户id")
 
+    class Meta:
+        verbose_name = "地址"
+        verbose_name_plural = "地址"
 
 # v3.5 订单
 class Order(models.Model):

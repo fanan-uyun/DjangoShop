@@ -13,10 +13,24 @@ class Seller(models.Model):
 
     card_id = models.CharField(max_length=32,verbose_name="身份证",null=True,blank=True)
 
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        verbose_name = "卖家"
+        verbose_name_plural = "卖家"
+
 # 定义店铺类型类
 class StoreType(models.Model):
     store_type = models.CharField(max_length=32,verbose_name="类型名称")
     type_description = models.TextField(verbose_name="类型描述")
+
+    def __str__(self):
+        return self.store_type
+
+    class Meta:
+        verbose_name = "店铺类型"
+        verbose_name_plural = "店铺类型"
 
 # 定义店铺类
 class Store(models.Model):
@@ -29,6 +43,13 @@ class Store(models.Model):
 
     user_id = models.IntegerField(verbose_name="店铺主人")
     type = models.ManyToManyField(to=StoreType,verbose_name="店铺类型")
+
+    def __str__(self):
+        return self.store_name
+
+    class Meta:
+        verbose_name = "店铺"
+        verbose_name_plural = "店铺"
 
 from django.db.models import Manager
 import datetime
@@ -48,6 +69,13 @@ class GoodsType(models.Model):
     description = models.TextField(verbose_name="商品类型描述")
     picture = models.ImageField(upload_to="buyer/images",verbose_name="商品类型首页展示图片")
     objects = GoodsTypeManage()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "商品类型"
+        verbose_name_plural = "商品类型"
 
 class GoodsManage(Manager):
     def get_queryset(self):
@@ -85,8 +113,19 @@ class Goods(models.Model):
     def __str__(self):
         return self.goods_name
 
+    class Meta:
+        verbose_name = "商品"
+        verbose_name_plural = "商品"
+
 # 定义商品图片类
 class GoodsImg(models.Model):
     img_address = models.ImageField(upload_to="store/images",verbose_name="图片地址")
     img_description = models.TextField(verbose_name="图片描述")
     goods_id = models.ForeignKey(to=Goods,on_delete=models.CASCADE,verbose_name="商品id")
+
+    def __str__(self):
+        return self.img_address
+
+    class Meta:
+        verbose_name = "商品图片"
+        verbose_name_plural = "商品图片"

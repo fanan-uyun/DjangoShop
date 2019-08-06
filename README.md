@@ -3615,3 +3615,6 @@ REST_FRAMEWORK = {
 效果：
 
 ![](https://github.com/py304/DjangoShop/blob/master/images/render3.jpg)
+
+
+## 三十二、安装django-simpleui后台管理主题，并应用，更改后台管理字段应用为中文
