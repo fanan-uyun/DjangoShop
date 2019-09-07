@@ -43,9 +43,9 @@
         <li class="col05"><em class="price">{{ goods.goods_price }}</em>元</li>
 		<li class="col06">
 			<div class="num_add">
-				<a href="javascript:;" onclick="changecount('add')" class="add fl">+</a>
+				<a href="javascript:;" class="add fl">+</a>
 				<input type="text" class="num_show fl" value="{{ goods.goods_number }}">
-				<a href="javascript:;" onclick="changecount('minus')" class="minus fl">-</a>
+				<a href="javascript:;" class="minus fl">-</a>
 			</div>
 		</li>
         <li class="col07"><em class="each_total">{{ goods.goods_total }}</em>元</li>
@@ -63,6 +63,34 @@
 {% block script %}
     <script src="/static/buyer/js/jquery-1.12.4.min.js"></script>
     <script>
+        //计算小计
+        function total_s(){
+            $('.col07').each(function () {
+                $count=$(this).prev().find('input').val();
+                $price=$(this).prev().prev().text();
+                total0=parseFloat($count)*parseFloat($price);   //小计
+                $(this).text(total0.toFixed(2));
+            });
+        }
+
+        //计算总计
+        function total_all(){
+            total_count=0;
+            total_price=0;
+
+            $(':checked:not(#allBox)').each(function () {
+                $count=$(this).parent().siblings('.col06').find('input').val();
+                $price=$(this).parent().siblings('.col05').text();
+                // console.log($count);
+                // console.log($price);
+                total=parseFloat($count)*parseFloat($price);
+                total_count++;
+                total_price+=total;
+            });
+            $('#total').text(total_price.toFixed(2));
+            $('#total_count').text(total_count);
+        }
+
         $("#allBox").click(
             function () {
                 {#console.log(this.checked)#} //true;false
@@ -86,8 +114,26 @@
             }
         );
 
-        function changecount(sign) {
+        //数量加，parseInt() 函数可解析一个字符串，并返回一个整数。
+        $('.add').click(function () {
+                num=parseInt($(this).next().val());
+                $(this).next().val(num+1).blur();
+                total_s();
+                total_all();
+            });
 
-        }
+        //数量减
+        $('.minus').click(function () {
+            num=parseInt($(this).prev().val());
+            if (num>1){
+                $(this).prev().val(num-1).blur();
+            }
+            total_s();
+            total_all();
+        });
+
+
+
+
     </script>
 {% endblock %}
